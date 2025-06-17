@@ -130,7 +130,7 @@ Changelog:
 - June 17, 2025. Implemented clickable food ingredients with serving suggestions showing weight/volume and units
 - June 17, 2025. Integrated food tracking meal statistics with dashboard AI meal plan for progress tracking
 - June 17, 2025. Fixed meal completion tracking to include both dashboard completed meals and photo-tracked meals
-- June 17, 2025. Added copyright footer "所有权©睡眠魔法师" to application bottom
+- June 17, 2025. Added stylized copyright footer with gradient design matching application theme
 ```
 
 ## User Preferences

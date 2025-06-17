@@ -45,10 +45,15 @@ function App() {
           <div className="flex-1">
             <Router />
           </div>
-          <footer className="bg-background border-t border-border py-4">
+          <footer className="bg-gradient-to-r from-background via-primary/5 to-background border-t border-primary/20 py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center text-sm text-muted-foreground">
-                所有权©睡眠魔法师
+              <div className="text-center">
+                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20">
+                  <span className="text-sm font-medium bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                    所有权©睡眠魔法师
+                  </span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-success animate-pulse"></div>
+                </div>
               </div>
             </div>
           </footer>
