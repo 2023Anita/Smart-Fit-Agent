@@ -7,6 +7,15 @@ import logoImage from "@assets/Sleep Magician - Illustrative Character Logo_1750
 
 export function Navigation() {
   const [location, setLocation] = useLocation();
+  const userEmail = localStorage.getItem('userEmail') || '用户';
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('trackedMeals');
+    setLocation('/login');
+  };
 
   const navItems = [
     { path: "/", label: "仪表盘", icon: Activity },
@@ -86,10 +95,36 @@ export function Navigation() {
 
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-10 h-10 health-gradient rounded-full flex items-center justify-center tech-shadow">
-                  <User className="h-5 w-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-white pulse-animation"></div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative p-0 h-auto">
+                      <div className="w-10 h-10 health-gradient rounded-full flex items-center justify-center tech-shadow">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-white pulse-animation"></div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>{userEmail}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setLocation('/profile')}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>个人设置</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation('/dashboard')}>
+                      <Activity className="mr-2 h-4 w-4" />
+                      <span>健康概览</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>退出登录</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>

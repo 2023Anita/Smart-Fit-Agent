@@ -12,8 +12,18 @@ import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  const token = localStorage.getItem('token');
+  
+  // If no token, redirect to login
+  if (!token && window.location.pathname !== '/register' && window.location.pathname !== '/login') {
+    window.location.href = '/login';
+    return null;
+  }
+
   return (
     <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profile" component={ProfileSetup} />
@@ -24,11 +34,14 @@ function Router() {
 }
 
 function App() {
+  const token = localStorage.getItem('token');
+  const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/register';
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background flex flex-col">
-          <Navigation />
+          {token && !isAuthPage && <Navigation />}
           <div className="flex-1">
             <Router />
           </div>
