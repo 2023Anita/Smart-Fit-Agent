@@ -631,6 +631,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/daily-progress/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = insertDailyProgressSchema.partial().parse(req.body);
+      const progress = await storage.updateDailyProgress(id, updates);
+      if (!progress) {
+        return res.status(404).json({ error: "Progress record not found" });
+      }
+      res.json(progress);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid update data" });
+    }
+  });
+
   // Weekly progress
   app.get("/api/weekly-progress/:userId/:startDate/:endDate", async (req, res) => {
     try {
