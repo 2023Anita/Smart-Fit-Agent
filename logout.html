@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>退出登录</title>
+</head>
+<body>
+    <script>
+        // Clear all authentication data
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('trackedMeals');
+        
+        // Redirect to login page
+        window.location.href = '/login';
+    </script>
+</body>
+</html>
