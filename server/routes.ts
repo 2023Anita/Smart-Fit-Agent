@@ -825,6 +825,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { registerUserSchema } = await import("@shared/schema");
+      const { hashPassword, generateToken, generateEmailVerificationToken } = await import("./auth");
+      
+      const validatedData = registerUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ error: "该邮箱已被注册" });
+      }
+
+      // Hash password and create user
+      const passwordHash = await hashPassword(validatedData.password);
+      const emailVerificationToken = generateEmailVerificationToken();
+      
+      const userData = {
+        email: validatedData.email,
+        passwordHash,
+        name: validatedData.name,
+        age: validatedData.age,
+        gender: validatedData.gender,
+        height: validatedData.height,
+        currentWeight: validatedData.currentWeight,
+        targetWeight: validatedData.targetWeight,
+        activityLevel: validatedData.activityLevel,
+        fitnessGoal: validatedData.fitnessGoal,
+        dietaryPreferences: validatedData.dietaryPreferences,
+        medicalConditions: validatedData.medicalConditions,
+        isEmailVerified: false,
+        emailVerificationToken
+      };
+
+      const user = await storage.createUser(userData);
+      const token = generateToken(user.id, user.email);
+
+      res.status(201).json({
+        message: "注册成功",
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isEmailVerified: user.isEmailVerified
+        }
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "输入数据验证失败",
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "注册失败，请稍后重试" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { loginUserSchema } = await import("@shared/schema");
+      const { verifyPassword, generateToken } = await import("./auth");
+      
+      const { email, password } = loginUserSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ error: "邮箱或密码错误" });
+      }
+
+      // Verify password
+      const isValidPassword = await verifyPassword(password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: "邮箱或密码错误" });
+      }
+
+      // Generate token
+      const token = generateToken(user.id, user.email);
+
+      res.json({
+        message: "登录成功",
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isEmailVerified: user.isEmailVerified
+        }
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "输入数据验证失败",
+          details: error.errors 
+        });
+      }
+      res.status(500).json({ error: "登录失败，请稍后重试" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
