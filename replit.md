@@ -127,6 +127,7 @@ Changelog:
 - June 17, 2025. Added visible logout button to navigation bar for improved user experience
 - June 17, 2025. Removed "+更多" text and show complete ingredient lists in meal tables
 - June 17, 2025. Added standard Chinese units for nutritional information display
+- June 17, 2025. Implemented clickable food ingredients with serving suggestions showing weight/volume and units
 - June 17, 2025. Added copyright footer "所有权©睡眠魔法师" to application bottom
 ```
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Flame, 
   Droplets, 
@@ -45,6 +46,61 @@ export default function Dashboard() {
   const today = new Date().toISOString().split('T')[0];
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Function to get serving suggestions based on food type
+  const getServingSuggestion = (ingredientName: string) => {
+    const ingredient = ingredientName.toLowerCase();
+    
+    // 主食类 - 重量单位
+    if (ingredient.includes('米饭') || ingredient.includes('大米')) return { amount: '150', unit: '克', description: '约1碗米饭' };
+    if (ingredient.includes('面条') || ingredient.includes('面')) return { amount: '100', unit: '克', description: '约1人份' };
+    if (ingredient.includes('馒头')) return { amount: '100', unit: '克', description: '约1个中等馒头' };
+    if (ingredient.includes('土豆')) return { amount: '200', unit: '克', description: '约1个中等土豆' };
+    if (ingredient.includes('红薯')) return { amount: '150', unit: '克', description: '约1个小红薯' };
+    
+    // 蛋白质类
+    if (ingredient.includes('鸡蛋')) return { amount: '50', unit: '克', description: '约1个鸡蛋' };
+    if (ingredient.includes('鸡胸肉') || ingredient.includes('鸡肉')) return { amount: '100', unit: '克', description: '约手掌大小' };
+    if (ingredient.includes('牛肉')) return { amount: '80', unit: '克', description: '约手掌厚度' };
+    if (ingredient.includes('猪肉')) return { amount: '80', unit: '克', description: '约手掌厚度' };
+    if (ingredient.includes('鱼') || ingredient.includes('三文鱼')) return { amount: '120', unit: '克', description: '约1块鱼排' };
+    if (ingredient.includes('虾')) return { amount: '100', unit: '克', description: '约8-10只中虾' };
+    if (ingredient.includes('豆腐')) return { amount: '150', unit: '克', description: '约半盒豆腐' };
+    
+    // 蔬菜类
+    if (ingredient.includes('西兰花')) return { amount: '200', unit: '克', description: '约1杯切块' };
+    if (ingredient.includes('菠菜')) return { amount: '100', unit: '克', description: '约2把叶子' };
+    if (ingredient.includes('胡萝卜')) return { amount: '100', unit: '克', description: '约1根中等胡萝卜' };
+    if (ingredient.includes('白菜') || ingredient.includes('青菜')) return { amount: '150', unit: '克', description: '约2-3片大叶' };
+    if (ingredient.includes('黄瓜')) return { amount: '150', unit: '克', description: '约1根黄瓜' };
+    if (ingredient.includes('番茄') || ingredient.includes('西红柿')) return { amount: '200', unit: '克', description: '约1个大番茄' };
+    
+    // 水果类
+    if (ingredient.includes('苹果')) return { amount: '200', unit: '克', description: '约1个中等苹果' };
+    if (ingredient.includes('香蕉')) return { amount: '120', unit: '克', description: '约1根香蕉' };
+    if (ingredient.includes('橙子')) return { amount: '150', unit: '克', description: '约1个橙子' };
+    if (ingredient.includes('葡萄')) return { amount: '100', unit: '克', description: '约15-20颗' };
+    
+    // 饮品类 - 体积单位
+    if (ingredient.includes('牛奶')) return { amount: '250', unit: '毫升', description: '约1杯牛奶' };
+    if (ingredient.includes('酸奶')) return { amount: '150', unit: '毫升', description: '约1小杯酸奶' };
+    if (ingredient.includes('果汁')) return { amount: '200', unit: '毫升', description: '约1杯果汁' };
+    if (ingredient.includes('豆浆')) return { amount: '250', unit: '毫升', description: '约1杯豆浆' };
+    if (ingredient.includes('汤')) return { amount: '300', unit: '毫升', description: '约1碗汤' };
+    
+    // 坚果类
+    if (ingredient.includes('核桃')) return { amount: '30', unit: '克', description: '约6-8个核桃仁' };
+    if (ingredient.includes('杏仁')) return { amount: '25', unit: '克', description: '约20颗杏仁' };
+    if (ingredient.includes('花生')) return { amount: '20', unit: '克', description: '约15-20颗花生' };
+    
+    // 油脂调料类
+    if (ingredient.includes('油') || ingredient.includes('橄榄油')) return { amount: '10', unit: '毫升', description: '约1汤匙' };
+    if (ingredient.includes('盐')) return { amount: '2', unit: '克', description: '约1/3茶匙' };
+    if (ingredient.includes('糖')) return { amount: '5', unit: '克', description: '约1茶匙' };
+    
+    // 默认建议
+    return { amount: '100', unit: '克', description: '建议适量食用' };
+  };
 
   // Load tracked meals from localStorage for today's calorie calculation
   const getTrackedMealsCalories = () => {
@@ -857,14 +913,46 @@ export default function Dashboard() {
                             <div className="space-y-2">
                               <div className="font-bold text-lg text-foreground leading-tight">{meal.name}</div>
                               <div className="flex flex-wrap gap-1">
-                                {meal.ingredients.map((ingredient: string, i: number) => (
-                                  <span 
-                                    key={i}
-                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary/10 to-success/10 text-primary border border-primary/20"
-                                  >
-                                    {ingredient}
-                                  </span>
-                                ))}
+                                {meal.ingredients.map((ingredient: string, i: number) => {
+                                  const servingSuggestion = getServingSuggestion(ingredient);
+                                  return (
+                                    <Dialog key={i}>
+                                      <DialogTrigger asChild>
+                                        <span 
+                                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary/10 to-success/10 text-primary border border-primary/20 cursor-pointer hover:bg-gradient-to-r hover:from-primary/20 hover:to-success/20 hover:scale-105 transition-all duration-200"
+                                        >
+                                          {ingredient}
+                                        </span>
+                                      </DialogTrigger>
+                                      <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                          <DialogTitle className="flex items-center space-x-2">
+                                            <span className="text-lg">🍽️</span>
+                                            <span>{ingredient}</span>
+                                          </DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4">
+                                          <div className="bg-gradient-to-r from-primary/5 to-success/5 p-4 rounded-lg border border-primary/20">
+                                            <div className="text-center">
+                                              <div className="text-3xl font-bold text-primary mb-2">
+                                                {servingSuggestion.amount}
+                                              </div>
+                                              <div className="text-lg font-medium text-muted-foreground mb-2">
+                                                {servingSuggestion.unit}
+                                              </div>
+                                              <div className="text-sm text-muted-foreground">
+                                                {servingSuggestion.description}
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="text-xs text-center text-muted-foreground">
+                                            💡 建议食用量，可根据个人需求调整
+                                          </div>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  );
+                                })}
                               </div>
                             </div>
                           </TableCell>
