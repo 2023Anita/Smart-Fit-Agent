@@ -517,51 +517,28 @@ export default function Dashboard() {
                           <span className="font-medium text-success">{meal.fat}g</span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            {meal.imageUrl && (
-                              <img 
-                                src={meal.imageUrl} 
-                                alt={meal.name}
-                                className="w-10 h-10 rounded-lg object-cover"
-                              />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleMealComplete(meal.id)}
+                            className={`${
+                              meal.completed 
+                                ? "bg-success text-white hover:bg-success/80 border-success" 
+                                : "hover:bg-primary/10"
+                            }`}
+                          >
+                            {meal.completed ? (
+                              <>
+                                <Check className="h-4 w-4 mr-2" />
+                                已完成
+                              </>
+                            ) : (
+                              <>
+                                <Clock className="h-4 w-4 mr-2" />
+                                标记完成
+                              </>
                             )}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => toggleMealComplete(meal.id)}>
-                                  {meal.completed ? (
-                                    <>
-                                      <Clock className="mr-2 h-4 w-4" />
-                                      标记为未完成
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Check className="mr-2 h-4 w-4" />
-                                      标记为完成
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  查看详情
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  编辑餐食
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  删除餐食
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
