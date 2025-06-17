@@ -271,9 +271,11 @@ export default function FoodTracking() {
               <div className="space-y-3">
                 {['早餐', '午餐', '晚餐', '加餐'].map((mealType) => {
                   const trackedCount = trackedMeals.filter(meal => meal.mealType === mealType).length;
-                  const plannedCount = mealPlan?.meals?.filter((meal: any) => meal.type === mealType).length || 0;
-                  const totalPlanned = plannedCount;
-                  const completionRate = totalPlanned > 0 ? Math.round((trackedCount / totalPlanned) * 100) : 0;
+                  const plannedMeals = mealPlan?.meals?.filter((meal: any) => meal.type === mealType) || [];
+                  const completedPlannedCount = plannedMeals.filter((meal: any) => meal.completed).length;
+                  const totalPlanned = plannedMeals.length;
+                  const totalCompleted = trackedCount + completedPlannedCount;
+                  const completionRate = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : 0;
                   
                   return (
                     <div key={mealType} className="space-y-2">
@@ -284,7 +286,7 @@ export default function FoodTracking() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline" className="text-xs">
-                            已记录 {trackedCount}
+                            已完成 {totalCompleted}
                           </Badge>
                           {totalPlanned > 0 && (
                             <Badge variant="secondary" className="text-xs">
@@ -313,7 +315,7 @@ export default function FoodTracking() {
               {mealPlan?.meals && (
                 <div className="mt-4 pt-4 border-t">
                   <div className="text-xs text-muted-foreground text-center">
-                    💡 基于AI饮食计划与实际记录的统计对比
+                    💡 统计包含仪表盘已完成计划 + 拍照记录餐食
                   </div>
                 </div>
               )}
