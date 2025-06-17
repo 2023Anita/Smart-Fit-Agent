@@ -450,25 +450,25 @@ export default function Dashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[100px]">状态</TableHead>
-                      <TableHead>餐次</TableHead>
-                      <TableHead>菜品名称</TableHead>
-                      <TableHead className="text-center">卡路里</TableHead>
-                      <TableHead className="text-center">蛋白质</TableHead>
-                      <TableHead className="text-center">碳水</TableHead>
-                      <TableHead className="text-center">脂肪</TableHead>
-                      <TableHead className="text-right">操作</TableHead>
+                      <TableHead className="w-[100px] text-sm font-semibold">状态</TableHead>
+                      <TableHead className="text-sm font-semibold">餐次</TableHead>
+                      <TableHead className="text-sm font-semibold">菜品名称</TableHead>
+                      <TableHead className="text-center text-sm font-semibold">卡路里</TableHead>
+                      <TableHead className="text-center text-sm font-semibold">蛋白质</TableHead>
+                      <TableHead className="text-center text-sm font-semibold">碳水</TableHead>
+                      <TableHead className="text-center text-sm font-semibold">脂肪</TableHead>
+                      <TableHead className="text-right text-sm font-semibold">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {mealPlan.meals.map((meal: any) => (
-                      <TableRow key={meal.id} className={meal.completed ? "bg-muted/30" : ""}>
-                        <TableCell>
+                      <TableRow key={meal.id} className={`${meal.completed ? "bg-muted/30" : ""} hover:bg-muted/20 transition-colors`}>
+                        <TableCell className="py-4">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleMealComplete(meal.id)}
-                            className={`w-8 h-8 p-0 rounded-full ${
+                            className={`w-9 h-9 p-0 rounded-full ${
                               meal.completed 
                                 ? "bg-success text-white hover:bg-success/80" 
                                 : "bg-muted hover:bg-muted/80"
@@ -481,10 +481,10 @@ export default function Dashboard() {
                             )}
                           </Button>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-4">
                           <Badge 
                             variant="secondary"
-                            className={`
+                            className={`text-sm font-medium px-3 py-1
                               ${meal.type === '早餐' ? 'bg-amber-100 text-amber-800' : ''}
                               ${meal.type === '午餐' ? 'bg-blue-100 text-blue-800' : ''}
                               ${meal.type === '晚餐' ? 'bg-purple-100 text-purple-800' : ''}
@@ -494,34 +494,34 @@ export default function Dashboard() {
                             {meal.type}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-4">
                           <div>
-                            <div className="font-medium">{meal.name}</div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="font-semibold text-base text-foreground">{meal.name}</div>
+                            <div className="text-sm text-muted-foreground mt-1">
                               {meal.ingredients.slice(0, 3).join(', ')}
                               {meal.ingredients.length > 3 && '...'}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <span className="font-medium text-secondary">{meal.calories}</span>
+                        <TableCell className="text-center py-4">
+                          <span className="font-bold text-lg text-secondary">{meal.calories}</span>
                           <div className="text-xs text-muted-foreground">kcal</div>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <span className="font-medium text-primary">{meal.protein}g</span>
+                        <TableCell className="text-center py-4">
+                          <span className="font-semibold text-base text-primary">{meal.protein}g</span>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <span className="font-medium text-accent">{meal.carbs}g</span>
+                        <TableCell className="text-center py-4">
+                          <span className="font-semibold text-base text-accent">{meal.carbs}g</span>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <span className="font-medium text-success">{meal.fat}g</span>
+                        <TableCell className="text-center py-4">
+                          <span className="font-semibold text-base text-success">{meal.fat}g</span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right py-4">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => toggleMealComplete(meal.id)}
-                            className={`${
+                            className={`text-sm font-medium px-4 py-2 ${
                               meal.completed 
                                 ? "bg-success text-white hover:bg-success/80 border-success" 
                                 : "hover:bg-primary/10"
