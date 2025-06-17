@@ -331,11 +331,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const targetCalories = dailyCalories + calorieAdjustment;
 
-      // Add true randomization to create varied meal plans
+      // Ultra-dynamic randomization system for maximum variety
       const currentTime = new Date().getTime();
+      const currentSecond = new Date().getSeconds();
+      const currentMinute = new Date().getMinutes();
+      const currentHour = new Date().getHours();
       const dayOfWeek = new Date().getDay();
       const userHash = userId.toString();
-      const randomSeed = Math.floor(currentTime / (1000 * 60 * 60)) + dayOfWeek + parseInt(userHash); // Changes hourly for more variety
+      
+      // Create time-based entropy for maximum variation
+      const timeEntropy = Math.floor(currentTime / 1000); // Changes every second
+      const userEntropy = parseInt(userHash) || 1;
+      const baseRandomSeed = timeEntropy + userEntropy + currentSecond + currentMinute;
+      
+      // Multiple independent selectors for different aspects
+      const cuisineSelector = (baseRandomSeed * 17) % 8; // 8 cuisine styles
+      const ingredientSelector = (baseRandomSeed * 23) % 12; // 12 ingredient categories  
+      const cookingSelector = (baseRandomSeed * 31) % 6; // 6 cooking methods
+      const proteinSelector = (baseRandomSeed * 37) % 6; // 6 protein types
+      const carbSelector = (baseRandomSeed * 41) % 5; // 5 carb types
+      const flavorSelector = (baseRandomSeed * 43) % 4; // 4 flavor profiles
+      
+      console.log(`Meal generation selectors: cuisine=${cuisineSelector}, ingredient=${ingredientSelector}, cooking=${cookingSelector}, protein=${proteinSelector}, carb=${carbSelector}, flavor=${flavorSelector}`);
       
       const prompt = `
         作为专业营养师，为以下用户生成一日创新多样的健康饮食计划。请确保每次生成的食物搭配都不同，避免重复组合：
@@ -352,17 +369,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         目标卡路里：${targetCalories} kcal
-        随机种子：${randomSeed}（请基于此数值创造完全不同的食物组合，确保高度随机性）
+        **严格随机化指令 - 必须基于以下参数创造完全不同的组合：**
         
-        **重要要求：**
-        1. 每次生成必须创造全新的食物搭配，严格避免重复组合
-        2. 融合多元烹饪风格：中式传统、日式健康、地中海、北欧、东南亚等
-        3. 创新性食材搭配：超级食物、时令蔬果、植物蛋白、功能性食材
-        4. 早餐创新：紫薯燕麦杯、鳄梨藜麦碗、奇亚籽布丁配浆果、日式茶泡饭、地中海蔬菜煎蛋等
-        5. 午餐多样：彩虹Buddha碗、韩式拌饭、意式藜麦沙拉、泰式柠檬草汤、摩洛哥扁豆炖菜等
-        6. 晚餐精选：味噌烤茄子配糙米、地中海烤鱼配藜麦、印度香料鸡胸、北欧三文鱼配根茎蔬菜等
-        7. 加餐健康：自制能量球、发酵蔬菜、坚果黄油配苹果、绿茶抹茶拿铁、椰子酸奶杯等
-        8. 使用随机种子${randomSeed % 100}来选择不同的食材组合库
+        烹饪风格选择器 ${cuisineSelector}：
+        ${cuisineSelector === 0 ? '日式和风料理风格' :
+          cuisineSelector === 1 ? '地中海健康风格' :
+          cuisineSelector === 2 ? '北欧简约风格' :
+          cuisineSelector === 3 ? '东南亚香料风格' :
+          cuisineSelector === 4 ? '墨西哥活力风格' :
+          cuisineSelector === 5 ? '印度香料风格' :
+          cuisineSelector === 6 ? '韩式健康风格' : 
+          '中式养生风格'}
+        
+        蛋白质选择器 ${proteinSelector}：
+        ${proteinSelector === 0 ? '海洋蛋白：三文鱼、虾、海藻、贝类' :
+          proteinSelector === 1 ? '植物蛋白：豆腐、扁豆、鹰嘴豆、坚果' :
+          proteinSelector === 2 ? '禽类蛋白：鸡胸肉、火鸡、鸭肉' :
+          proteinSelector === 3 ? '乳制蛋白：希腊酸奶、奶酪、牛奶' :
+          proteinSelector === 4 ? '蛋类蛋白：鸡蛋、鹌鹑蛋' :
+          '种子蛋白：奇亚籽、大麻籽、南瓜籽'}
+        
+        碳水化合物选择器 ${carbSelector}：
+        ${carbSelector === 0 ? '全谷物：藜麦、糙米、燕麦、荞麦' :
+          carbSelector === 1 ? '根茎类：红薯、紫薯、山药、胡萝卜' :
+          carbSelector === 2 ? '豆类：黑豆、红豆、绿豆、芸豆' :
+          carbSelector === 3 ? '水果类：香蕉、苹果、蓝莓、石榴' :
+          '蔬菜类：南瓜、玉米、甜菜、洋葱'}
+        
+        风味特色选择器 ${flavorSelector}：
+        ${flavorSelector === 0 ? '清香型：柠檬、薄荷、香草、罗勒' :
+          flavorSelector === 1 ? '香料型：姜黄、肉桂、丁香、八角' :
+          flavorSelector === 2 ? '鲜美型：海带、香菇、番茄、洋葱' :
+          '果香型：椰子、芒果、柠檬草、迷迭香'}
+        
+        烹饪方法选择器 ${cookingSelector}：
+        ${cookingSelector === 0 ? '蒸制类烹饪方法' :
+          cookingSelector === 1 ? '烘烤类烹饪方法' :
+          cookingSelector === 2 ? '生食类处理方法' :
+          cookingSelector === 3 ? '炒制类烹饪方法' :
+          cookingSelector === 4 ? '炖煮类烹饪方法' :
+          '凉拌类处理方法'}
+        
+        **绝对要求：**
+        1. 每个餐次必须严格按照对应选择器组合食材
+        2. 菜品名称必须融合选定的风格、蛋白质、碳水和风味
+        3. 绝对不能使用常见经典搭配
+        4. 创造前所未有的创新组合
+        5. 早餐、午餐、晚餐、加餐必须使用不同的选择器组合
         
         请生成包含早餐、午餐、晚餐和加餐的完整计划，每餐包含：
         1. 创新菜品名称（中文，避免常见搭配）
