@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 98%);
+  --foreground: hsl(0, 0%, 13%);
+  --muted: hsl(0, 0%, 96%);
+  --muted-foreground: hsl(0, 0%, 46%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 13%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(0, 0%, 13%);
+  --border: hsl(0, 0%, 90%);
+  --input: hsl(0, 0%, 90%);
+  --primary: hsl(104, 43%, 47%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(36, 100%, 50%);
+  --secondary-foreground: hsl(0, 0%, 13%);
+  --accent: hsl(207, 90%, 54%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --success: hsl(88, 50%, 53%);
+  --success-foreground: hsl(0, 0%, 13%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 13%);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(240, 10%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 4%, 16%);
+  --muted-foreground: hsl(240, 5%, 65%);
+  --popover: hsl(240, 10%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 4%, 16%);
+  --input: hsl(240, 4%, 16%);
+  --primary: hsl(104, 43%, 47%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(36, 100%, 50%);
+  --secondary-foreground: hsl(0, 0%, 13%);
+  --accent: hsl(207, 90%, 54%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --success: hsl(88, 50%, 53%);
+  --success-foreground: hsl(0, 0%, 13%);
+  --destructive: hsl(0, 62%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 5%, 84%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(104, 43%, 47%) 0%, hsl(88, 50%, 53%) 100%);
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .pulse-animation {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
+}
