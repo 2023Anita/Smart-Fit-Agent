@@ -644,141 +644,243 @@ export default function Dashboard() {
               </div>
             </Card>
           ) : (
-            <Card>
-              <CardHeader>
+            <Card className="bg-gradient-to-br from-background via-background to-muted/20 border-2 border-primary/10 shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-success/5 border-b border-border/50">
                 <CardTitle className="flex items-center justify-between">
-                  <span>今日餐食安排</span>
-                  <Badge variant="outline">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-success rounded-lg flex items-center justify-center">
+                      <Utensils className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-xl font-bold bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                      今日餐食安排
+                    </span>
+                  </div>
+                  <Badge 
+                    variant="outline" 
+                    className="bg-gradient-to-r from-success/10 to-primary/10 border-success/30 text-success font-semibold px-4 py-2"
+                  >
+                    <div className="w-2 h-2 bg-success rounded-full mr-2 animate-pulse"></div>
                     已完成 {mealPlan.meals.filter((m: any) => m.completed).length}/{mealPlan.meals.length}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px] text-sm font-semibold">状态</TableHead>
-                      <TableHead className="text-sm font-semibold">餐次</TableHead>
-                      <TableHead className="text-sm font-semibold">菜品名称</TableHead>
-                      <TableHead className="text-center text-sm font-semibold">卡路里</TableHead>
-                      <TableHead className="text-center text-sm font-semibold">蛋白质</TableHead>
-                      <TableHead className="text-center text-sm font-semibold">碳水</TableHead>
-                      <TableHead className="text-center text-sm font-semibold">脂肪</TableHead>
-                      <TableHead className="text-right text-sm font-semibold">操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mealPlan.meals.map((meal: any) => (
-                      <TableRow key={meal.id} className={`${meal.completed ? "bg-muted/30" : ""} hover:bg-muted/20 transition-colors`}>
-                        <TableCell className="py-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleMealComplete(meal.id)}
-                            className={`w-9 h-9 p-0 rounded-full ${
-                              meal.completed 
-                                ? "bg-success text-white hover:bg-success/80" 
-                                : "bg-muted hover:bg-muted/80"
-                            }`}
-                          >
-                            {meal.completed ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              <Clock className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <Badge 
-                            variant="secondary"
-                            className={`text-sm font-medium px-3 py-1
-                              ${meal.type === '早餐' ? 'bg-amber-100 text-amber-800' : ''}
-                              ${meal.type === '午餐' ? 'bg-blue-100 text-blue-800' : ''}
-                              ${meal.type === '晚餐' ? 'bg-purple-100 text-purple-800' : ''}
-                              ${meal.type === '加餐' ? 'bg-green-100 text-green-800' : ''}
-                            `}
-                          >
-                            {meal.type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="py-4">
-                          <div>
-                            <div className="font-semibold text-base text-foreground">{meal.name}</div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {meal.ingredients.slice(0, 3).join(', ')}
-                              {meal.ingredients.length > 3 && '...'}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center py-4">
-                          <span className="font-bold text-lg text-secondary">{meal.calories}</span>
-                          <div className="text-xs text-muted-foreground">kcal</div>
-                        </TableCell>
-                        <TableCell className="text-center py-4">
-                          <span className="font-semibold text-base text-primary">{meal.protein}g</span>
-                        </TableCell>
-                        <TableCell className="text-center py-4">
-                          <span className="font-semibold text-base text-accent">{meal.carbs}g</span>
-                        </TableCell>
-                        <TableCell className="text-center py-4">
-                          <span className="font-semibold text-base text-success">{meal.fat}g</span>
-                        </TableCell>
-                        <TableCell className="text-right py-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => toggleMealComplete(meal.id)}
-                            className={`text-sm font-medium px-4 py-2 ${
-                              meal.completed 
-                                ? "bg-success text-white hover:bg-success/80 border-success" 
-                                : "hover:bg-primary/10"
-                            }`}
-                          >
-                            {meal.completed ? (
-                              <>
-                                <Check className="h-4 w-4 mr-2" />
-                                已完成
-                              </>
-                            ) : (
-                              <>
-                                <Clock className="h-4 w-4 mr-2" />
-                                标记完成
-                              </>
-                            )}
-                          </Button>
-                        </TableCell>
+              <CardContent className="p-0">
+                <div className="overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gradient-to-r from-muted/30 to-muted/50 border-b-2 border-primary/20 hover:bg-muted/40">
+                        <TableHead className="w-[80px] text-center font-bold text-primary">状态</TableHead>
+                        <TableHead className="font-bold text-primary">餐次</TableHead>
+                        <TableHead className="font-bold text-primary">菜品详情</TableHead>
+                        <TableHead className="text-center font-bold text-primary">卡路里</TableHead>
+                        <TableHead className="text-center font-bold text-primary">蛋白质</TableHead>
+                        <TableHead className="text-center font-bold text-primary">碳水</TableHead>
+                        <TableHead className="text-center font-bold text-primary">脂肪</TableHead>
+                        <TableHead className="text-center font-bold text-primary">操作</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {mealPlan.meals.map((meal: any, index: number) => (
+                        <TableRow 
+                          key={meal.id} 
+                          className={`
+                            ${meal.completed 
+                              ? "bg-gradient-to-r from-success/5 to-success/10 border-l-4 border-success" 
+                              : "bg-gradient-to-r from-background to-muted/5 border-l-4 border-transparent hover:border-primary/30"
+                            } 
+                            hover:bg-gradient-to-r hover:from-primary/5 hover:to-success/5 
+                            transition-all duration-300 ease-in-out
+                            ${index % 2 === 0 ? 'bg-muted/20' : ''}
+                          `}
+                        >
+                          <TableCell className="py-6 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleMealComplete(meal.id)}
+                              className={`
+                                w-12 h-12 p-0 rounded-full transition-all duration-300 ease-in-out
+                                ${meal.completed 
+                                  ? "bg-gradient-to-br from-success to-success/80 text-white shadow-lg shadow-success/30 hover:shadow-xl hover:shadow-success/40 scale-105" 
+                                  : "bg-gradient-to-br from-muted to-muted/80 hover:from-primary/20 hover:to-success/20 hover:shadow-md"
+                                }
+                              `}
+                            >
+                              {meal.completed ? (
+                                <Check className="h-5 w-5 animate-in zoom-in duration-200" />
+                              ) : (
+                                <Clock className="h-5 w-5" />
+                              )}
+                            </Button>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <Badge 
+                              variant="secondary"
+                              className={`
+                                text-sm font-bold px-4 py-2 shadow-sm transition-all duration-200
+                                ${meal.type === '早餐' ? 'bg-gradient-to-r from-amber-100 to-amber-200 text-amber-900 border border-amber-300' : ''}
+                                ${meal.type === '午餐' ? 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 border border-blue-300' : ''}
+                                ${meal.type === '晚餐' ? 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-900 border border-purple-300' : ''}
+                                ${meal.type === '加餐' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-900 border border-green-300' : ''}
+                              `}
+                            >
+                              {meal.type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <div className="space-y-2">
+                              <div className="font-bold text-lg text-foreground leading-tight">{meal.name}</div>
+                              <div className="flex flex-wrap gap-1">
+                                {meal.ingredients.slice(0, 4).map((ingredient: string, i: number) => (
+                                  <span 
+                                    key={i}
+                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary/10 to-success/10 text-primary border border-primary/20"
+                                  >
+                                    {ingredient}
+                                  </span>
+                                ))}
+                                {meal.ingredients.length > 4 && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                                    +{meal.ingredients.length - 4}更多
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-6">
+                            <div className="flex flex-col items-center space-y-1">
+                              <div className="relative">
+                                <span className="font-black text-2xl bg-gradient-to-r from-secondary to-secondary/80 bg-clip-text text-transparent">
+                                  {meal.calories}
+                                </span>
+                                <div className="absolute -inset-1 bg-gradient-to-r from-secondary/20 to-secondary/10 rounded-lg blur opacity-25"></div>
+                              </div>
+                              <div className="text-xs font-medium text-muted-foreground tracking-wider uppercase">kcal</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-6">
+                            <div className="flex flex-col items-center space-y-1">
+                              <span className="font-bold text-xl text-primary">{meal.protein}</span>
+                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-6">
+                            <div className="flex flex-col items-center space-y-1">
+                              <span className="font-bold text-xl text-accent">{meal.carbs}</span>
+                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-6">
+                            <div className="flex flex-col items-center space-y-1">
+                              <span className="font-bold text-xl text-success">{meal.fat}</span>
+                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center py-6">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleMealComplete(meal.id)}
+                              className={`
+                                text-sm font-bold px-6 py-3 transition-all duration-300 ease-in-out rounded-full
+                                ${meal.completed 
+                                  ? "bg-gradient-to-r from-success to-success/90 text-white border-success shadow-lg shadow-success/30 hover:shadow-xl hover:shadow-success/40 hover:scale-105" 
+                                  : "bg-gradient-to-r from-background to-muted/50 hover:from-primary/10 hover:to-success/10 border-primary/30 hover:border-primary/50 hover:shadow-md"
+                                }
+                              `}
+                            >
+                              {meal.completed ? (
+                                <>
+                                  <Check className="h-4 w-4 mr-2" />
+                                  已完成
+                                </>
+                              ) : (
+                                <>
+                                  <Clock className="h-4 w-4 mr-2" />
+                                  标记完成
+                                </>
+                              )}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
                 
                 {/* Nutrition Summary */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg">
-                  <h4 className="font-semibold mb-3">今日营养摄入总计</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-secondary">
-                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.calories, 0)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">总卡路里</div>
+                <div className="mt-8 p-6 bg-gradient-to-br from-primary/5 via-success/5 to-accent/5 rounded-2xl border border-primary/20 shadow-inner">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-6 h-6 bg-gradient-to-br from-primary to-success rounded-md flex items-center justify-center">
+                      <Target className="h-3 w-3 text-white" />
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.protein, 0)}g
+                    <h4 className="text-lg font-bold bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                      今日营养摄入总计
+                    </h4>
+                    <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent"></div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative bg-gradient-to-br from-background to-secondary/5 p-4 rounded-xl border border-secondary/20 text-center hover:shadow-lg transition-all duration-300">
+                        <div className="text-3xl font-black bg-gradient-to-br from-secondary to-secondary/80 bg-clip-text text-transparent mb-2">
+                          {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.calories, 0)}
+                        </div>
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">总卡路里</div>
+                        <div className="text-xs text-secondary/70 mt-1">kcal</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">蛋白质</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-accent">
-                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.carbs, 0)}g
+                    
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative bg-gradient-to-br from-background to-primary/5 p-4 rounded-xl border border-primary/20 text-center hover:shadow-lg transition-all duration-300">
+                        <div className="text-3xl font-black bg-gradient-to-br from-primary to-primary/80 bg-clip-text text-transparent mb-2">
+                          {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.protein, 0)}
+                        </div>
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">蛋白质</div>
+                        <div className="text-xs text-primary/70 mt-1">g</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">碳水化合物</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-success">
-                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.fat, 0)}g
+                    
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative bg-gradient-to-br from-background to-accent/5 p-4 rounded-xl border border-accent/20 text-center hover:shadow-lg transition-all duration-300">
+                        <div className="text-3xl font-black bg-gradient-to-br from-accent to-accent/80 bg-clip-text text-transparent mb-2">
+                          {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.carbs, 0)}
+                        </div>
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">碳水化合物</div>
+                        <div className="text-xs text-accent/70 mt-1">g</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">脂肪</div>
+                    </div>
+                    
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-success/20 to-success/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="relative bg-gradient-to-br from-background to-success/5 p-4 rounded-xl border border-success/20 text-center hover:shadow-lg transition-all duration-300">
+                        <div className="text-3xl font-black bg-gradient-to-br from-success to-success/80 bg-clip-text text-transparent mb-2">
+                          {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.fat, 0)}
+                        </div>
+                        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">脂肪</div>
+                        <div className="text-xs text-success/70 mt-1">g</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Progress indicators */}
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">完成进度</span>
+                      <span className="font-bold text-primary">
+                        {Math.round((mealPlan.meals.filter((m: any) => m.completed).length / mealPlan.meals.length) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted/30 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-primary via-success to-accent transition-all duration-500 ease-out rounded-full"
+                        style={{ 
+                          width: `${(mealPlan.meals.filter((m: any) => m.completed).length / mealPlan.meals.length) * 100}%` 
+                        }}
+                      ></div>
                     </div>
                   </div>
                 </div>
