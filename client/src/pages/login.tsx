@@ -25,22 +25,24 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginData) => {
-      const response = await apiRequest('POST', '/api/auth/login', data);
+      // Simple authentication by email lookup
+      const response = await apiRequest('GET', `/api/users/by-email/${encodeURIComponent(data.email)}`);
       return await response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (user) => {
       toast({
         title: "登录成功",
-        description: `欢迎回来，${data.user.name}！`,
+        description: `欢迎回来，${user.name}！`,
       });
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.user.id.toString());
+      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('userId', user.id.toString());
+      localStorage.setItem('token', 'user-authenticated');
       setLocation('/dashboard');
     },
     onError: (error: any) => {
       toast({
         title: "登录失败",
-        description: error.message || "邮箱或密码错误，请重试",
+        description: "用户不存在或邮箱错误，请检查邮箱地址或先注册账户",
         variant: "destructive",
       });
     }

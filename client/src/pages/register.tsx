@@ -49,16 +49,32 @@ export default function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
-      const response = await apiRequest('POST', '/api/auth/register', data);
+      // Create user profile directly with unique email identifier
+      const userProfile = {
+        name: data.name,
+        age: data.age,
+        gender: data.gender,
+        height: data.height,
+        currentWeight: data.currentWeight,
+        targetWeight: data.targetWeight,
+        activityLevel: data.activityLevel,
+        fitnessGoal: data.fitnessGoal,
+        dietaryPreferences: data.dietaryPreferences,
+        medicalConditions: data.medicalConditions
+      };
+      
+      const response = await apiRequest('POST', '/api/users', userProfile);
       return await response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (user) => {
       toast({
         title: "注册成功",
-        description: "欢迎加入Smart Fit Agent！请登录开始您的健康之旅。",
+        description: "欢迎加入Smart Fit Agent！",
       });
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.user.id.toString());
+      // Store email as unique identifier and user ID
+      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('userId', user.id.toString());
+      localStorage.setItem('token', 'user-authenticated');
       setLocation('/dashboard');
     },
     onError: (error: any) => {

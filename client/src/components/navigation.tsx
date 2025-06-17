@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { User, Activity, Calendar, TrendingUp, Menu, Camera } from "lucide-react";
+import { User, Activity, Calendar, TrendingUp, Menu, Camera, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import logoImage from "@/assets/logo.png";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import logoImage from "@assets/Sleep Magician - Illustrative Character Logo_1750166367787.png";
 
 export function Navigation() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const navItems = [
     { path: "/", label: "仪表盘", icon: Activity },
@@ -85,10 +86,40 @@ export function Navigation() {
 
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <div className="w-10 h-10 health-gradient rounded-full flex items-center justify-center tech-shadow">
-                  <User className="h-5 w-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-white pulse-animation"></div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative p-0 h-auto">
+                      <div className="w-10 h-10 health-gradient rounded-full flex items-center justify-center tech-shadow">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-white pulse-animation"></div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>我的账户</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setLocation('/profile')}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>个人设置</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation('/dashboard')}>
+                      <Activity className="mr-2 h-4 w-4" />
+                      <span>健康概览</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userId');
+                        window.location.href = '/login';
+                      }}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>退出登录</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>

@@ -34,11 +34,14 @@ function Router() {
 }
 
 function App() {
+  const token = localStorage.getItem('token');
+  const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/register';
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          <Navigation />
+          {token && !isAuthPage && <Navigation />}
           <Router />
         </div>
         <Toaster />
