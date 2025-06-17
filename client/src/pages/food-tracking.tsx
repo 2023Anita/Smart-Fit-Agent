@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MealPhotoAnalyzer } from "@/components/meal-photo-analyzer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, TrendingUp, Target, Plus, Camera, Utensils, Sparkles, ChefHat } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Calendar, TrendingUp, Target, Plus, Camera, Utensils, Sparkles, ChefHat, Trash2, MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
@@ -37,6 +38,34 @@ export default function FoodTracking() {
   const [trackedMeals, setTrackedMeals] = useState<TrackedMeal[]>([]);
   const [showAnalyzer, setShowAnalyzer] = useState(false);
 
+  // Load tracked meals from localStorage on component mount
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `trackedMeals_${today}`;
+    const savedMeals = localStorage.getItem(storageKey);
+    
+    if (savedMeals) {
+      try {
+        const parsedMeals = JSON.parse(savedMeals).map((meal: any) => ({
+          ...meal,
+          timestamp: new Date(meal.timestamp)
+        }));
+        setTrackedMeals(parsedMeals);
+      } catch (error) {
+        console.error('Error parsing saved meals:', error);
+      }
+    }
+  }, []);
+
+  // Save tracked meals to localStorage whenever the state changes
+  useEffect(() => {
+    if (trackedMeals.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const storageKey = `trackedMeals_${today}`;
+      localStorage.setItem(storageKey, JSON.stringify(trackedMeals));
+    }
+  }, [trackedMeals]);
+
   const handleAnalysisComplete = (analysis: MealAnalysis) => {
     const currentHour = new Date().getHours();
     let mealType: '早餐' | '午餐' | '晚餐' | '加餐';
@@ -60,6 +89,17 @@ export default function FoodTracking() {
 
     setTrackedMeals(prev => [trackedMeal, ...prev]);
     setShowAnalyzer(false);
+  };
+
+  const deleteMeal = (mealId: string) => {
+    setTrackedMeals(prev => prev.filter(meal => meal.id !== mealId));
+  };
+
+  const clearAllMeals = () => {
+    setTrackedMeals([]);
+    const today = new Date().toISOString().split('T')[0];
+    const storageKey = `trackedMeals_${today}`;
+    localStorage.removeItem(storageKey);
   };
 
   const totalNutrition = trackedMeals.reduce(
@@ -106,13 +146,25 @@ export default function FoodTracking() {
               {format(new Date(), 'yyyy年MM月dd日 EEEE', { locale: zhCN })}
             </p>
           </div>
-          <Button
-            onClick={() => setShowAnalyzer(!showAnalyzer)}
-            className="flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>添加餐食</span>
-          </Button>
+          <div className="flex items-center space-x-3">
+            {trackedMeals.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={clearAllMeals}
+                className="flex items-center space-x-2 text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>清空记录</span>
+              </Button>
+            )}
+            <Button
+              onClick={() => setShowAnalyzer(!showAnalyzer)}
+              className="flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>添加餐食</span>
+            </Button>
+          </div>
         </div>
 
         {showAnalyzer && (
@@ -298,7 +350,7 @@ export default function FoodTracking() {
             ) : (
               <div className="space-y-4">
                 {trackedMeals.map((meal) => (
-                  <div key={meal.id} className="border rounded-lg p-4">
+                  <div key={meal.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{meal.mealName}</h3>
@@ -317,6 +369,22 @@ export default function FoodTracking() {
                           </Badge>
                         </div>
                       </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem 
+                            onClick={() => deleteMeal(meal.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            删除记录
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
