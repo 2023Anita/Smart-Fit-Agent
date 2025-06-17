@@ -48,11 +48,12 @@ function App() {
           <footer className="bg-gradient-to-r from-background via-primary/5 to-background border-t border-primary/20 py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center">
-                <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20">
-                  <span className="text-sm font-semibold text-foreground">
+                <div className="inline-flex items-center space-x-3 px-6 py-3 rounded-full bg-gradient-to-r from-slate-900/50 via-blue-900/30 to-slate-900/50 border border-cyan-400/30 shadow-lg shadow-cyan-400/20">
+                  <span className="text-sm font-mono font-bold tracking-wider text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse">
                     所有权©睡眠魔法师
                   </span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-success animate-pulse"></div>
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400 animate-ping"></div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 absolute"></div>
                 </div>
               </div>
             </div>
