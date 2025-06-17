@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { User, Activity, Calendar, TrendingUp, Menu } from "lucide-react";
+import { User, Activity, Calendar, TrendingUp, Menu, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -8,6 +8,7 @@ export function Navigation() {
 
   const navItems = [
     { path: "/", label: "仪表盘", icon: Activity },
+    { path: "/food-tracking", label: "食物追踪", icon: Camera },
     { path: "/profile", label: "个人资料", icon: User },
   ];
 

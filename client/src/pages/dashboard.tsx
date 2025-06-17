@@ -15,7 +15,8 @@ import {
   Activity,
   Target,
   Utensils,
-  Dumbbell
+  Dumbbell,
+  Camera
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -294,6 +295,13 @@ export default function Dashboard() {
                         制定运动计划
                       </>
                     )}
+                  </Button>
+                  <Button
+                    onClick={() => window.location.href = '/food-tracking'}
+                    className="w-full bg-secondary text-white hover:bg-secondary/90"
+                  >
+                    <Camera className="h-4 w-4 mr-2" />
+                    拍照识别食物
                   </Button>
                 </div>
               </div>
