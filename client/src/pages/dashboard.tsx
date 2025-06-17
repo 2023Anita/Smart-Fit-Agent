@@ -1245,54 +1245,128 @@ export default function Dashboard() {
 
         {/* Weekly Summary */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6">本周总结</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">运动与营养统计</CardTitle>
+          <h2 className="text-2xl font-bold text-foreground mb-6 font-mono tracking-wide">本周总结</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            
+            {/* Weekly Stats - Interactive Cards */}
+            <Card className="bg-gradient-to-br from-slate-900/20 via-background to-cyan-900/10 border-cyan-500/30 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all duration-500 group">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-mono text-cyan-100 flex items-center space-x-2">
+                  <Activity className="h-5 w-5 text-cyan-400 animate-pulse" />
+                  <span>运动统计</span>
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 border-l-4 border-accent bg-accent/5">
-                  <div className="flex items-center space-x-3">
-                    <Activity className="h-4 w-4 text-accent" />
-                    <div>
-                      <p className="font-medium text-foreground">运动次数</p>
-                      <p className="text-sm text-muted-foreground">本周完成 5 次训练</p>
-                    </div>
+                <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 hover:border-cyan-400/50 transition-all cursor-pointer group-hover:scale-105">
+                  <div>
+                    <p className="font-bold text-cyan-100 text-lg">完成运动</p>
+                    <p className="text-sm text-cyan-300/80 font-mono">本周训练次数</p>
                   </div>
-                  <span className="text-xl font-bold text-accent">5</span>
+                  <div className="text-right">
+                    <span className="text-3xl font-black text-cyan-400 font-mono drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]">
+                      {weeklyProgress ? weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length : 0}
+                    </span>
+                    <p className="text-xs text-cyan-300 font-mono">次</p>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3 border-l-4 border-secondary bg-secondary/5">
-                  <div className="flex items-center space-x-3">
-                    <Flame className="h-4 w-4 text-secondary" />
-                    <div>
-                      <p className="font-medium text-foreground">卡路里消耗</p>
-                      <p className="text-sm text-muted-foreground">本周共消耗</p>
-                    </div>
+                <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30 hover:border-orange-400/50 transition-all cursor-pointer group-hover:scale-105">
+                  <div>
+                    <p className="font-bold text-orange-100 text-lg">卡路里消耗</p>
+                    <p className="text-sm text-orange-300/80 font-mono">本周总消耗</p>
                   </div>
-                  <span className="text-xl font-bold text-secondary">2,140</span>
+                  <div className="text-right">
+                    <span className="text-3xl font-black text-orange-400 font-mono drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]">
+                      {weeklyProgress ? weeklyProgress.reduce((sum: number, d: any) => sum + (d.caloriesBurned || 0), 0).toLocaleString() : 0}
+                    </span>
+                    <p className="text-xs text-orange-300 font-mono">千卡</p>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3 border-l-4 border-primary bg-primary/5">
-                  <div className="flex items-center space-x-3">
-                    <Target className="h-4 w-4 text-primary" />
-                    <div>
-                      <p className="font-medium text-foreground">计划完成度</p>
-                      <p className="text-sm text-muted-foreground">按计划执行</p>
-                    </div>
+                <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 hover:border-green-400/50 transition-all cursor-pointer group-hover:scale-105">
+                  <div>
+                    <p className="font-bold text-green-100 text-lg">计划完成度</p>
+                    <p className="text-sm text-green-300/80 font-mono">执行率统计</p>
                   </div>
-                  <span className="text-xl font-bold text-primary">85%</span>
+                  <div className="text-right">
+                    <span className="text-3xl font-black text-green-400 font-mono drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]">
+                      {weeklyProgress ? Math.round((weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length / 7) * 100) : 0}
+                    </span>
+                    <p className="text-xs text-green-300 font-mono">%</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Weekly Progress Chart */}
+            <Card className="bg-gradient-to-br from-slate-900/20 via-background to-purple-900/10 border-purple-500/30 shadow-lg shadow-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-lg font-mono text-purple-100 flex items-center space-x-2">
+                  <TrendingUp className="h-5 w-5 text-purple-400 animate-bounce" />
+                  <span>本周趋势</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {weeklyProgress && weeklyProgress.length > 0 && (
+                  <ProgressChart
+                    title="每日卡路里消耗"
+                    data={weeklyProgress.map((d: any) => d.caloriesBurned || 0)}
+                    labels={weeklyProgress.map((d: any) => {
+                      const date = new Date(d.date);
+                      return `${date.getMonth() + 1}/${date.getDate()}`;
+                    })}
+                    color="#8b5cf6"
+                    unit="千卡"
+                    trend={{
+                      value: weeklyProgress[weeklyProgress.length - 1]?.caloriesBurned || 0,
+                      label: "今日消耗量",
+                      positive: (weeklyProgress[weeklyProgress.length - 1]?.caloriesBurned || 0) > 0
+                    }}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
+            {/* AI Insights */}
+            <Card className="bg-gradient-to-br from-slate-900/20 via-background to-emerald-900/10 border-emerald-500/30 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-500">
+              <CardHeader>
+                <CardTitle className="text-lg font-mono text-emerald-100 flex items-center space-x-2">
+                  <Brain className="h-5 w-5 text-emerald-400 animate-pulse" />
+                  <span>AI 智能分析</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-500/30 backdrop-blur-sm">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></div>
+                    <span className="font-bold text-emerald-100 font-mono">本周表现分析</span>
+                  </div>
+                  <div className="space-y-2 text-sm font-mono">
+                    <p className="text-emerald-200/90">
+                      📊 运动频率: {weeklyProgress ? Math.round((weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length / 7) * 100) : 0}% 
+                      {weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 5 ? " (优秀)" : 
+                       weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 3 ? " (良好)" : " (需改进)"}
+                    </p>
+                    <p className="text-emerald-200/90">
+                      🔥 总消耗: {weeklyProgress ? weeklyProgress.reduce((sum: number, d: any) => sum + (d.caloriesBurned || 0), 0).toLocaleString() : 0} 千卡
+                    </p>
+                    <p className="text-emerald-200/90">
+                      💧 饮水达标: {dailyStats.waterIntake >= 2000 ? "✅ 已达标" : "⚠️ 需补充"}
+                    </p>
+                  </div>
                 </div>
 
-                {/* AI Recommendation */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-primary to-success rounded-lg text-white">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-500/30 backdrop-blur-sm">
                   <div className="flex items-center space-x-2 mb-2">
-                    <Brain className="h-4 w-4" />
-                    <span className="font-semibold">AI建议</span>
+                    <Target className="h-4 w-4 text-blue-400" />
+                    <span className="font-bold text-blue-100 font-mono text-sm">AI 建议</span>
                   </div>
-                  <p className="text-sm">
-                    本周表现很好！建议下周增加15分钟有氧运动，并保持当前的饮食计划。
+                  <p className="text-blue-200/90 text-sm font-mono leading-relaxed">
+                    {weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 5 
+                      ? "表现出色！建议保持当前运动强度，可适当增加力量训练。" 
+                      : weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 3
+                        ? "运动频率良好，建议增加到每周5次以获得更佳效果。"
+                        : "运动频率偏低，建议每周至少3-4次中等强度运动。"}
                   </p>
                 </div>
               </CardContent>
