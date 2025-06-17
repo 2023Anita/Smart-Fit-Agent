@@ -245,7 +245,8 @@ export default function FoodTracking() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
                   <Button
                     onClick={() => setShowAnalyzer(true)}
-                    className="bg-gradient-to-r from-primary to-success hover:from-primary/90 hover:to-success/90 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-success hover:from-primary/90 hover:to-success/90 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
                     <Camera className="h-5 w-5 mr-2" />
                     <span>拍照识别食物</span>
@@ -253,8 +254,9 @@ export default function FoodTracking() {
                   
                   <Button
                     variant="outline"
+                    size="lg"
                     onClick={() => setShowAnalyzer(true)}
-                    className="px-6 py-3 rounded-full border-primary/30 hover:border-primary/50 hover:bg-primary/5"
+                    className="px-6 py-3 rounded-full border-primary/30 hover:border-primary/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     <span>手动添加</span>
