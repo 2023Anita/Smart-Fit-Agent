@@ -651,7 +651,7 @@ export default function Dashboard() {
                     <div className="w-8 h-8 bg-gradient-to-br from-primary to-success rounded-lg flex items-center justify-center">
                       <Utensils className="h-4 w-4 text-white" />
                     </div>
-                    <span className="text-xl font-bold bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                    <span className="text-xl font-bold text-foreground">
                       今日餐食安排
                     </span>
                   </div>
@@ -814,7 +814,7 @@ export default function Dashboard() {
                     <div className="w-6 h-6 bg-gradient-to-br from-primary to-success rounded-md flex items-center justify-center">
                       <Target className="h-3 w-3 text-white" />
                     </div>
-                    <h4 className="text-lg font-bold bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                    <h4 className="text-lg font-bold text-foreground">
                       今日营养摄入总计
                     </h4>
                     <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent"></div>
@@ -824,7 +824,7 @@ export default function Dashboard() {
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative bg-gradient-to-br from-background to-secondary/5 p-4 rounded-xl border border-secondary/20 text-center hover:shadow-lg transition-all duration-300">
-                        <div className="text-3xl font-black bg-gradient-to-br from-secondary to-secondary/80 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-black text-secondary mb-2">
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.calories, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">总卡路里</div>
@@ -835,7 +835,7 @@ export default function Dashboard() {
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative bg-gradient-to-br from-background to-primary/5 p-4 rounded-xl border border-primary/20 text-center hover:shadow-lg transition-all duration-300">
-                        <div className="text-3xl font-black bg-gradient-to-br from-primary to-primary/80 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-black text-primary mb-2">
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.protein, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">蛋白质</div>
@@ -846,7 +846,7 @@ export default function Dashboard() {
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-accent/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative bg-gradient-to-br from-background to-accent/5 p-4 rounded-xl border border-accent/20 text-center hover:shadow-lg transition-all duration-300">
-                        <div className="text-3xl font-black bg-gradient-to-br from-accent to-accent/80 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-black text-accent mb-2">
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.carbs, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">碳水化合物</div>
@@ -857,7 +857,7 @@ export default function Dashboard() {
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-br from-success/20 to-success/10 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       <div className="relative bg-gradient-to-br from-background to-success/5 p-4 rounded-xl border border-success/20 text-center hover:shadow-lg transition-all duration-300">
-                        <div className="text-3xl font-black bg-gradient-to-br from-success to-success/80 bg-clip-text text-transparent mb-2">
+                        <div className="text-3xl font-black text-success mb-2">
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.fat, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">脂肪</div>
