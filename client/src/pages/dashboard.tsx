@@ -510,6 +510,40 @@ export default function Dashboard() {
                       还差 {Math.max(0, 10000 - dailyStats.steps).toLocaleString()} 步达成目标
                     </div>
                   </div>
+                  <div className="flex justify-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateSteps.mutate(dailyStats.steps + 1000)}
+                      disabled={updateSteps.isPending}
+                      className="text-xs"
+                    >
+                      +1000步
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateSteps.mutate(dailyStats.steps + 2000)}
+                      disabled={updateSteps.isPending}
+                      className="text-xs"
+                    >
+                      +2000步
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const steps = prompt("请输入今日总步数:", dailyStats.steps.toString());
+                        if (steps && !isNaN(Number(steps))) {
+                          updateSteps.mutate(Number(steps));
+                        }
+                      }}
+                      disabled={updateSteps.isPending}
+                      className="text-xs"
+                    >
+                      手动输入
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -820,7 +854,15 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => {
+                const weight = prompt("请输入当前体重(kg):", user.currentWeight?.toString() || "70");
+                if (weight && !isNaN(Number(weight))) {
+                  updateWeight.mutate(Number(weight));
+                }
+              }}
+            >
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <TrendingUp className="h-5 w-5 text-primary" />
@@ -830,13 +872,21 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => {
+                const steps = prompt("请输入今日步数:", dailyStats.steps.toString());
+                if (steps && !isNaN(Number(steps))) {
+                  updateSteps.mutate(Number(steps));
+                }
+              }}
+            >
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Activity className="h-5 w-5 text-secondary" />
+                  <Footprints className="h-5 w-5 text-secondary" />
                 </div>
-                <h3 className="font-medium text-foreground">开始运动</h3>
-                <p className="text-sm text-muted-foreground mt-1">计时训练</p>
+                <h3 className="font-medium text-foreground">记录步数</h3>
+                <p className="text-sm text-muted-foreground mt-1">输入步数</p>
               </CardContent>
             </Card>
 
