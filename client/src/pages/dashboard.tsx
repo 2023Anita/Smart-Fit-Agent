@@ -1430,41 +1430,41 @@ export default function Dashboard() {
                 </div>
 
                 {/* Daily AI Recommendations */}
-                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-500/30 backdrop-blur-sm">
+                <div className="p-4 rounded-lg bg-slate-800/80 border border-blue-400/50 backdrop-blur-sm">
                   <div className="flex items-center space-x-2 mb-3">
-                    <Target className="h-4 w-4 text-blue-400" />
-                    <span className="font-bold text-blue-100 font-mono">🎯 今日建议</span>
+                    <Target className="h-4 w-4 text-blue-300" />
+                    <span className="font-bold text-white font-mono">🎯 今日建议</span>
                   </div>
-                  <div className="space-y-2 text-xs font-mono leading-relaxed">
+                  <div className="space-y-2 text-sm font-mono leading-relaxed">
                     {/* Calorie balance recommendations */}
                     {(dailyStats.caloriesConsumed - dailyStats.caloriesBurned) > 500 && (
-                      <p className="text-orange-200 bg-orange-900/20 p-2 rounded border-l-2 border-orange-400">
+                      <p className="text-white bg-orange-600/80 p-3 rounded border-l-4 border-orange-400 font-medium">
                         🔥 今日卡路里过剩较多，建议增加有氧运动或减少下一餐份量
                       </p>
                     )}
                     {(dailyStats.caloriesConsumed - dailyStats.caloriesBurned) < -300 && (
-                      <p className="text-blue-200 bg-blue-900/20 p-2 rounded border-l-2 border-blue-400">
+                      <p className="text-white bg-blue-600/80 p-3 rounded border-l-4 border-blue-400 font-medium">
                         💪 今日卡路里不足，建议补充健康加餐或减少运动强度
                       </p>
                     )}
                     
                     {/* Water intake recommendations */}
                     {dailyStats.waterIntake < 1500 && (
-                      <p className="text-cyan-200 bg-cyan-900/20 p-2 rounded border-l-2 border-cyan-400">
+                      <p className="text-white bg-cyan-600/80 p-3 rounded border-l-4 border-cyan-400 font-medium">
                         💧 饮水不足，建议每小时补充200-300ml水分
                       </p>
                     )}
                     
                     {/* Exercise recommendations */}
                     {workoutPlan && workoutPlan.exercises.filter((ex: any) => ex.completed).length === 0 && (
-                      <p className="text-red-200 bg-red-900/20 p-2 rounded border-l-2 border-red-400">
+                      <p className="text-white bg-red-600/80 p-3 rounded border-l-4 border-red-400 font-medium">
                         🏃 尚未开始运动，建议从轻度运动开始激活身体
                       </p>
                     )}
                     
                     {/* Steps recommendations */}
                     {dailyStats.steps < 5000 && (
-                      <p className="text-yellow-200 bg-yellow-900/20 p-2 rounded border-l-2 border-yellow-400">
+                      <p className="text-white bg-yellow-600/80 p-3 rounded border-l-4 border-yellow-400 font-medium">
                         🚶 今日步数较少，建议增加日常步行活动
                       </p>
                     )}
@@ -1473,7 +1473,7 @@ export default function Dashboard() {
                     {(dailyStats.caloriesConsumed - dailyStats.caloriesBurned) <= 500 && 
                      (dailyStats.caloriesConsumed - dailyStats.caloriesBurned) >= -300 && 
                      dailyStats.waterIntake >= 1500 && (
-                      <p className="text-green-200 bg-green-900/20 p-2 rounded border-l-2 border-green-400">
+                      <p className="text-white bg-green-600/80 p-3 rounded border-l-4 border-green-400 font-medium">
                         ✅ 今日表现良好！保持现有节奏，注意充足休息
                       </p>
                     )}
@@ -1481,45 +1481,45 @@ export default function Dashboard() {
                 </div>
 
                 {/* Weekly Analysis */}
-                <div className="p-4 rounded-lg bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 backdrop-blur-sm">
+                <div className="p-4 rounded-lg bg-slate-800/80 border border-purple-400/50 backdrop-blur-sm">
                   <div className="flex items-center space-x-2 mb-3">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                    <span className="font-bold text-purple-100 font-mono">📊 本周总评</span>
+                    <div className="w-2 h-2 bg-purple-300 rounded-full animate-pulse"></div>
+                    <span className="font-bold text-white font-mono">📊 本周总评</span>
                   </div>
-                  <div className="space-y-2 text-xs font-mono leading-relaxed">
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-purple-300">
+                  <div className="space-y-3 text-sm font-mono leading-relaxed">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center bg-slate-700/50 p-3 rounded-lg border border-purple-300/30">
+                        <div className="text-xl font-bold text-white">
                           {weeklyProgress ? weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length : 0}/7
                         </div>
-                        <div className="text-xs text-purple-400">运动天数</div>
+                        <div className="text-sm text-purple-300 font-medium">运动天数</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-pink-300">
+                      <div className="text-center bg-slate-700/50 p-3 rounded-lg border border-pink-300/30">
+                        <div className="text-xl font-bold text-white">
                           {weeklyProgress ? Math.round((weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length / 7) * 100) : 0}%
                         </div>
-                        <div className="text-xs text-pink-400">执行率</div>
+                        <div className="text-sm text-pink-300 font-medium">执行率</div>
                       </div>
                     </div>
                     
                     {/* Weekly recommendations */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 5 ? (
-                        <p className="text-green-200 bg-green-900/20 p-2 rounded border-l-2 border-green-400">
+                        <p className="text-white bg-green-600/80 p-3 rounded border-l-4 border-green-400 font-medium">
                           🌟 本周表现优秀！建议下周保持强度，增加力量训练比例
                         </p>
                       ) : weeklyProgress && weeklyProgress.filter((d: any) => d.caloriesBurned && d.caloriesBurned > 0).length >= 3 ? (
-                        <p className="text-yellow-200 bg-yellow-900/20 p-2 rounded border-l-2 border-yellow-400">
+                        <p className="text-white bg-yellow-600/80 p-3 rounded border-l-4 border-yellow-400 font-medium">
                           ⚡ 本周中等表现，建议增加到每周5次运动
                         </p>
                       ) : (
-                        <p className="text-red-200 bg-red-900/20 p-2 rounded border-l-2 border-red-400">
+                        <p className="text-white bg-red-600/80 p-3 rounded border-l-4 border-red-400 font-medium">
                           📈 本周运动不足，建议制定更可行的运动计划
                         </p>
                       )}
                       
                       {/* Long-term suggestions */}
-                      <p className="text-purple-200 bg-purple-900/20 p-2 rounded border-l-2 border-purple-400">
+                      <p className="text-white bg-purple-600/80 p-3 rounded border-l-4 border-purple-400 font-medium">
                         🎯 长期建议: {
                           user?.fitnessGoal === '减重' ? '保持热量缺口，增加有氧运动频率' :
                           user?.fitnessGoal === '增肌' ? '确保蛋白质摄入，重点进行力量训练' :
