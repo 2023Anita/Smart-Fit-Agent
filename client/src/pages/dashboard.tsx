@@ -857,7 +857,7 @@ export default function Dashboard() {
                             <div className="space-y-2">
                               <div className="font-bold text-lg text-foreground leading-tight">{meal.name}</div>
                               <div className="flex flex-wrap gap-1">
-                                {meal.ingredients.slice(0, 4).map((ingredient: string, i: number) => (
+                                {meal.ingredients.map((ingredient: string, i: number) => (
                                   <span 
                                     key={i}
                                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary/10 to-success/10 text-primary border border-primary/20"
@@ -865,11 +865,6 @@ export default function Dashboard() {
                                     {ingredient}
                                   </span>
                                 ))}
-                                {meal.ingredients.length > 4 && (
-                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                                    +{meal.ingredients.length - 4}更多
-                                  </span>
-                                )}
                               </div>
                             </div>
                           </TableCell>
@@ -887,19 +882,19 @@ export default function Dashboard() {
                           <TableCell className="text-center py-6">
                             <div className="flex flex-col items-center space-y-1">
                               <span className="font-bold text-xl text-primary">{meal.protein}</span>
-                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                              <div className="text-xs font-medium text-muted-foreground">蛋白质 (g)</div>
                             </div>
                           </TableCell>
                           <TableCell className="text-center py-6">
                             <div className="flex flex-col items-center space-y-1">
                               <span className="font-bold text-xl text-accent">{meal.carbs}</span>
-                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                              <div className="text-xs font-medium text-muted-foreground">碳水 (g)</div>
                             </div>
                           </TableCell>
                           <TableCell className="text-center py-6">
                             <div className="flex flex-col items-center space-y-1">
                               <span className="font-bold text-xl text-success">{meal.fat}</span>
-                              <div className="text-xs font-medium text-muted-foreground">g</div>
+                              <div className="text-xs font-medium text-muted-foreground">脂肪 (g)</div>
                             </div>
                           </TableCell>
                           <TableCell className="text-center py-6">
@@ -954,7 +949,7 @@ export default function Dashboard() {
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.calories, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">总卡路里</div>
-                        <div className="text-xs text-secondary/70 mt-1">kcal</div>
+                        <div className="text-xs text-secondary/70 mt-1">千卡 (kcal)</div>
                       </div>
                     </div>
                     
@@ -965,7 +960,7 @@ export default function Dashboard() {
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.protein, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">蛋白质</div>
-                        <div className="text-xs text-primary/70 mt-1">g</div>
+                        <div className="text-xs text-primary/70 mt-1">克 (g)</div>
                       </div>
                     </div>
                     
@@ -976,7 +971,7 @@ export default function Dashboard() {
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.carbs, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">碳水化合物</div>
-                        <div className="text-xs text-accent/70 mt-1">g</div>
+                        <div className="text-xs text-accent/70 mt-1">克 (g)</div>
                       </div>
                     </div>
                     
@@ -987,7 +982,7 @@ export default function Dashboard() {
                           {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.fat, 0)}
                         </div>
                         <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">脂肪</div>
-                        <div className="text-xs text-success/70 mt-1">g</div>
+                        <div className="text-xs text-success/70 mt-1">克 (g)</div>
                       </div>
                     </div>
                   </div>
