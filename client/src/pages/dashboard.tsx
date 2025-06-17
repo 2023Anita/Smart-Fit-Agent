@@ -85,6 +85,27 @@ export default function Dashboard() {
     },
   });
 
+  // Fetch weekly progress for charts
+  const getWeekDates = () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 6); // Get last 7 days
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
+    };
+  };
+
+  const { startDate, endDate } = getWeekDates();
+  const { data: weeklyProgress } = useQuery({
+    queryKey: ["/api/weekly-progress", userId, startDate, endDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/weekly-progress/${userId}/${startDate}/${endDate}`);
+      if (!response.ok) throw new Error("Failed to fetch weekly progress");
+      return response.json();
+    },
+  });
+
   // Generate meal plan mutation
   const generateMealPlan = useMutation({
     mutationFn: async () => {
@@ -237,6 +258,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+      queryClient.invalidateQueries({ queryKey: ["/api/weekly-progress", userId, startDate, endDate] });
       // Also update user's current weight
       queryClient.invalidateQueries({ queryKey: ["/api/users", userId] });
     },
@@ -279,6 +301,50 @@ export default function Dashboard() {
     steps: dailyProgress?.steps || 0,
     weight: dailyProgress?.weight || user.currentWeight,
   };
+
+  // Process weekly progress data for charts
+  const processWeightData = () => {
+    if (!weeklyProgress || weeklyProgress.length === 0) {
+      return {
+        weightData: [user.currentWeight],
+        weightLabels: ['今天'],
+        weightTrend: null
+      };
+    }
+
+    // Sort by date and get last 7 days
+    const sortedProgress = weeklyProgress.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const last7Days = sortedProgress.slice(-7);
+
+    const weightData = last7Days.map((progress: any) => progress.weight || user.currentWeight);
+    const weightLabels = last7Days.map((progress: any) => {
+      const date = new Date(progress.date);
+      return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    });
+
+    // Calculate trend
+    let weightTrend = null;
+    if (weightData.length >= 2) {
+      const firstWeight = weightData[0];
+      const lastWeight = weightData[weightData.length - 1];
+      const weightChange = lastWeight - firstWeight;
+      const daysTracked = weightData.length;
+      
+      weightTrend = {
+        value: Math.abs(weightChange),
+        label: weightChange > 0 
+          ? `${daysTracked}天内增重 ${weightChange.toFixed(1)}kg` 
+          : weightChange < 0 
+          ? `${daysTracked}天内减重 ${Math.abs(weightChange).toFixed(1)}kg`
+          : `${daysTracked}天内体重保持稳定`,
+        positive: user.fitnessGoal === '减重' ? weightChange < 0 : user.fitnessGoal === '增重' ? weightChange > 0 : true
+      };
+    }
+
+    return { weightData, weightLabels, weightTrend };
+  };
+
+  const { weightData, weightLabels, weightTrend } = processWeightData();
 
   const targetCalories = 2000; // This should be calculated based on user profile
   const calorieProgress = (dailyStats.caloriesConsumed / targetCalories) * 100;
@@ -770,22 +836,108 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Weight Progress Chart */}
             <ProgressChart
-              title="体重变化"
-              data={[74, 73.5, 73.2, 72.8, 72.5, 72.2, 72]}
-              labels={["周一", "周二", "周三", "周四", "周五", "周六", "周日"]}
+              title="体重变化趋势"
+              data={weightData}
+              labels={weightLabels}
               color="hsl(104, 43%, 47%)"
               unit="kg"
-              trend={{
-                value: 2,
-                label: "本周减重 2kg，距离目标还有 3kg",
-                positive: true
-              }}
+              trend={weightTrend || undefined}
             />
 
-            {/* Weekly Summary */}
+            {/* Daily Weight Tracking */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">本周总结</CardTitle>
+                <CardTitle className="text-base">每日体重记录</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg">
+                  <div>
+                    <p className="text-sm text-muted-foreground">当前体重</p>
+                    <p className="text-2xl font-bold text-foreground">{dailyStats.weight}kg</p>
+                    <p className="text-xs text-muted-foreground">
+                      目标: {user.targetWeight}kg
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">距离目标</p>
+                    <p className={`text-lg font-semibold ${
+                      Math.abs(dailyStats.weight - user.targetWeight) <= 1 
+                        ? 'text-success' 
+                        : 'text-secondary'
+                    }`}>
+                      {Math.abs(dailyStats.weight - user.targetWeight).toFixed(1)}kg
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">快速记录</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateWeight.mutate(dailyStats.weight - 0.1)}
+                      disabled={updateWeight.isPending}
+                      className="text-xs"
+                    >
+                      -0.1kg
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const weight = prompt("请输入今日体重(kg):", dailyStats.weight.toString());
+                        if (weight && !isNaN(Number(weight))) {
+                          updateWeight.mutate(Number(weight));
+                        }
+                      }}
+                      disabled={updateWeight.isPending}
+                      className="text-xs font-medium"
+                    >
+                      精确输入
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateWeight.mutate(dailyStats.weight + 0.1)}
+                      disabled={updateWeight.isPending}
+                      className="text-xs"
+                    >
+                      +0.1kg
+                    </Button>
+                  </div>
+                </div>
+
+                {weeklyProgress && weeklyProgress.length > 1 && (
+                  <div className="pt-2 border-t">
+                    <p className="text-sm font-medium text-foreground mb-2">近期记录</p>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {weeklyProgress
+                        .slice(-5)
+                        .reverse()
+                        .map((progress: any, index: number) => (
+                          <div key={progress.id} className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground">
+                              {new Date(progress.date).toLocaleDateString('zh-CN')}
+                            </span>
+                            <span className="font-medium">{progress.weight}kg</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Weekly Summary */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">本周总结</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">运动与营养统计</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-3 border-l-4 border-accent bg-accent/5">
