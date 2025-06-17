@@ -40,9 +40,55 @@ export default function Dashboard() {
   const [userId] = useState(() => {
     return parseInt(localStorage.getItem("userId") || "1");
   });
+  const [trackedMealsCalories, setTrackedMealsCalories] = useState(0);
   const today = new Date().toISOString().split('T')[0];
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Load tracked meals from localStorage for today's calorie calculation
+  const getTrackedMealsCalories = () => {
+    const storageKey = `trackedMeals_${today}`;
+    const savedMeals = localStorage.getItem(storageKey);
+    
+    if (savedMeals) {
+      try {
+        const parsedMeals = JSON.parse(savedMeals);
+        return parsedMeals.reduce((total: number, meal: any) => {
+          return total + (meal.nutritionalInfo?.calories || 0);
+        }, 0);
+      } catch (error) {
+        console.error('Error parsing saved meals:', error);
+        return 0;
+      }
+    }
+    return 0;
+  };
+
+  // Update tracked meals calories on mount and when localStorage changes
+  useEffect(() => {
+    const updateTrackedCalories = () => {
+      setTrackedMealsCalories(getTrackedMealsCalories());
+    };
+
+    updateTrackedCalories();
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key?.startsWith('trackedMeals_')) {
+        updateTrackedCalories();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check for changes periodically in case of same-tab updates
+    const interval = setInterval(updateTrackedCalories, 2000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [today]);
 
   // Fetch user data
   const { data: user, isLoading: userLoading } = useQuery({
@@ -297,8 +343,11 @@ export default function Dashboard() {
 
   // Calculate daily stats
   const currentWeight = dailyProgress?.weight || user.currentWeight;
+  const mealPlanCalories = mealPlan?.meals.filter((m: any) => m.completed).reduce((sum: number, m: any) => sum + m.calories, 0) || 0;
+  const totalCaloriesConsumed = mealPlanCalories + trackedMealsCalories;
+  
   const dailyStats: DailyStats = {
-    caloriesConsumed: mealPlan?.meals.filter((m: any) => m.completed).reduce((sum: number, m: any) => sum + m.calories, 0) || 0,
+    caloriesConsumed: totalCaloriesConsumed,
     caloriesBurned: workoutPlan?.exercises.filter((e: any) => e.completed).reduce((sum: number, e: any) => sum + e.calories, 0) || 0,
     waterIntake: dailyProgress?.waterIntake || 0,
     steps: dailyProgress?.steps || 0,
@@ -481,21 +530,49 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-foreground">
+                    <div className={`text-3xl font-bold ${calorieProgress > 100 ? 'text-destructive' : 'text-foreground'}`}>
                       {dailyStats.caloriesConsumed}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       / {targetCalories} kcal
                     </div>
                   </div>
-                  <Progress value={calorieProgress} className="h-2" />
+                  <Progress 
+                    value={Math.min(calorieProgress, 100)} 
+                    className="h-2" 
+                  />
+                  
+                  {calorieProgress > 100 && (
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                      <div className="text-sm text-destructive font-medium text-center">
+                        ⚠️ 已超出目标 {Math.round(dailyStats.caloriesConsumed - targetCalories)} kcal
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      还可摄入 <span className="font-semibold text-primary">
-                        {Math.max(0, targetCalories - dailyStats.caloriesConsumed)} kcal
-                      </span>
+                    <p className={`text-sm ${calorieProgress > 100 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      {calorieProgress > 100 
+                        ? `超出目标 ${Math.round(dailyStats.caloriesConsumed - targetCalories)} kcal`
+                        : `还可摄入 ${Math.max(0, targetCalories - dailyStats.caloriesConsumed)} kcal`
+                      }
                     </p>
                   </div>
+                  
+                  {/* Calorie breakdown when there are multiple sources */}
+                  {(mealPlanCalories > 0 && trackedMealsCalories > 0) && (
+                    <div className="space-y-2 pt-3 border-t border-muted">
+                      <div className="text-xs text-muted-foreground text-center">摄入来源</div>
+                      <div className="flex justify-between text-xs">
+                        <span>饮食计划:</span>
+                        <span className="font-medium">{mealPlanCalories} kcal</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span>拍照识别:</span>
+                        <span className="font-medium text-primary">{trackedMealsCalories} kcal</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
