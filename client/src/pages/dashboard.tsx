@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MealCard } from "@/components/meal-card";
 import { WorkoutCard } from "@/components/workout-card";
 import { ProgressChart } from "@/components/progress-chart";
+import { AiChat } from "@/components/ai-chat";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { UserProfile, DailyStats } from "@/types";
@@ -1202,6 +1203,49 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </section>
+
+        {/* AI Chat Interface */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6">AI健康顾问</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AiChat />
+            </div>
+            <div className="space-y-4">
+              <Card className="modern-card border-primary/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                      <Brain className="h-4 w-4 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-foreground">智能建议</h3>
+                  </div>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>• 询问营养搭配和卡路里计算</p>
+                    <p>• 获取运动建议和训练计划</p>
+                    <p>• 了解健康生活方式指导</p>
+                    <p>• 咨询饮食调整和体重管理</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="modern-card border-success/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-foreground">今日提醒</h4>
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                      活跃
+                    </Badge>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p className="text-muted-foreground">💧 记得补充水分</p>
+                    <p className="text-muted-foreground">🏃 完成今日运动计划</p>
+                    <p className="text-muted-foreground">📱 上传餐食照片</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </section>
 
