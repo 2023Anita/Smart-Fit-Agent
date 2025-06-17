@@ -138,6 +138,8 @@ Changelog:
 - June 17, 2025. Redesigned weekly summary with real-time data integration, cyberpunk styling, and AI-powered insights
 - June 17, 2025. Fixed workout completion to update calorie tracking and refresh weekly statistics in real-time
 - June 17, 2025. Enhanced AI recommendations with daily analysis, personalized suggestions, and comprehensive weekly evaluations
+- June 17, 2025. Implemented workout repetition tracking with count-based calorie calculation and cyberpunk styling
+- June 17, 2025. Added target completion counts for exercises with real-time progress bars and dynamic calorie updates
 ```
 
 ## User Preferences

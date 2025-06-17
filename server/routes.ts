@@ -651,7 +651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "有氧",
               duration: 30,
               calories: 150,
-              instructions: ["保持中等速度", "注意呼吸节奏"],
+              instructions: ["保持中等速度", "注意呼吸节奏", "保持姿态挺直"],
               difficulty: "简单"
             },
             {
@@ -659,22 +659,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "力量",
               sets: 3,
               reps: 12,
-              calories: 50,
-              instructions: ["保持身体笔直", "下降至胸部接近地面"],
+              calories: 80,
+              instructions: ["保持身体笔直", "下降至胸部接近地面", "控制呼吸节奏"],
+              difficulty: "中等"
+            },
+            {
+              name: "深蹲",
+              type: "力量", 
+              sets: 3,
+              reps: 15,
+              calories: 90,
+              instructions: ["脚与肩同宽", "下蹲时保持膝盖不超过脚尖", "臀部向后坐"],
+              difficulty: "中等"
+            },
+            {
+              name: "平板支撑",
+              type: "力量",
+              duration: 60,
+              calories: 40,
+              instructions: ["保持身体成一条直线", "收紧核心肌群", "均匀呼吸"],
               difficulty: "中等"
             }
           ],
-          totalDuration: 45,
-          totalCalories: 200
+          totalDuration: 60,
+          totalCalories: 360
         };
       }
 
-      // Add IDs and completion status to exercises
-      const exercisesWithIds = workoutData.exercises.map((exercise: any, index: number) => ({
-        ...exercise,
-        id: `exercise-${Date.now()}-${index}`,
-        completed: false
-      }));
+      // Add IDs, completion status, and target counts to exercises
+      const exercisesWithIds = workoutData.exercises.map((exercise: any, index: number) => {
+        // Determine target count based on exercise type and sets
+        let targetCount = 1; // Default for time-based exercises
+        
+        if (exercise.sets && exercise.reps) {
+          // For strength exercises, target count equals number of sets
+          targetCount = exercise.sets;
+        } else if (exercise.type === '有氧' && exercise.duration) {
+          // For cardio, break into smaller intervals (e.g., 30 min = 3 x 10 min intervals)
+          targetCount = Math.max(1, Math.ceil(exercise.duration / 10));
+        } else if (exercise.type === '柔韧性' || exercise.type === '平衡性') {
+          // For flexibility/balance, typically 2-3 rounds
+          targetCount = 2;
+        }
+        
+        return {
+          ...exercise,
+          id: `exercise-${Date.now()}-${index}`,
+          completed: false,
+          completedCount: 0,
+          targetCount: targetCount
+        };
+      });
 
       const workoutPlan = await storage.createWorkoutPlan({
         userId,

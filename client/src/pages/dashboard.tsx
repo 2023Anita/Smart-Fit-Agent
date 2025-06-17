@@ -1195,11 +1195,55 @@ export default function Dashboard() {
                   }}
                   onToggleComplete={toggleExerciseComplete.mutate}
                   onUpdateCount={(exerciseId, count) => {
-                    // Update exercise count in local state
+                    // Update exercise count and recalculate calories
                     const updatedExercises = workoutPlan.exercises.map((ex: any) =>
                       ex.id === exerciseId ? { ...ex, completedCount: count } : ex
                     );
-                    // This will be handled by the mutation for calorie calculation
+                    
+                    // Update local state immediately for better UX
+                    queryClient.setQueryData(["/api/workout-plans", userId, today], {
+                      ...workoutPlan,
+                      exercises: updatedExercises,
+                    });
+                    
+                    // Calculate and update calories based on completion ratio
+                    const totalCaloriesBurned = updatedExercises.reduce((sum: number, ex: any) => {
+                      const completionRatio = Math.min((ex.completedCount || 0) / (ex.targetCount || 1), 1);
+                      return sum + Math.round((ex.calories || 0) * completionRatio);
+                    }, 0);
+                    
+                    // Add step calories to total
+                    const stepCalories = Math.round((dailyStats.steps || 0) * 0.04);
+                    const finalCaloriesBurned = totalCaloriesBurned + stepCalories;
+                    
+                    // Debounced update to avoid too many API calls
+                    const updateCalories = async () => {
+                      try {
+                        if (dailyProgress) {
+                          await apiRequest("PATCH", `/api/daily-progress/${dailyProgress.id}`, {
+                            caloriesBurned: finalCaloriesBurned,
+                          });
+                        } else {
+                          await apiRequest("POST", "/api/daily-progress", {
+                            userId,
+                            date: today,
+                            caloriesBurned: finalCaloriesBurned,
+                            waterIntake: dailyStats.waterIntake || 0,
+                            steps: dailyStats.steps || 0,
+                            weight: user?.currentWeight || 70,
+                          });
+                        }
+                        // Refresh progress data
+                        queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+                        queryClient.invalidateQueries({ queryKey: ["/api/weekly-progress", userId] });
+                      } catch (error) {
+                        console.error('Failed to update calories:', error);
+                      }
+                    };
+                    
+                    // Debounce the API call
+                    clearTimeout((window as any).updateCaloriesTimer);
+                    (window as any).updateCaloriesTimer = setTimeout(updateCalories, 1000);
                   }}
                 />
               ))}
