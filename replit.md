@@ -124,6 +124,7 @@ Changelog:
 - June 17, 2025. Implemented step-based calorie calculation (0.04 cal/step) integrated into total calories burned
 - June 17, 2025. Added detailed calorie breakdown showing workout calories + step calories separately
 - June 17, 2025. Restored multi-user authentication system with email-based registration and login
+- June 17, 2025. Added visible logout button to navigation bar for improved user experience
 - June 17, 2025. Added copyright footer "所有权©睡眠魔法师" to application bottom
 ```
 

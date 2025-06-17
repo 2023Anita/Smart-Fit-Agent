@@ -94,6 +94,17 @@ export function Navigation() {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Quick logout button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 font-medium"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                退出登录
+              </Button>
+              
               <div className="relative">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -114,14 +125,6 @@ export function Navigation() {
                     <DropdownMenuItem onClick={() => setLocation('/dashboard')}>
                       <Activity className="mr-2 h-4 w-4" />
                       <span>健康概览</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={handleLogout}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>退出登录</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
