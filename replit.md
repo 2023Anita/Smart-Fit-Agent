@@ -120,6 +120,7 @@ Changelog:
 - June 17, 2025. Implemented dynamic calorie target calculation using BMR/TDEE formulas
 - June 17, 2025. Enhanced meal generation with flexible food combinations and variety
 - June 17, 2025. Added calorie overflow warnings and source breakdown display
+- June 17, 2025. Updated application branding to "Smart Fit Agent"
 ```
 
 ## User Preferences
