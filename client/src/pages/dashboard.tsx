@@ -368,7 +368,7 @@ export default function Dashboard() {
                   <div>
                     <h2 className="text-2xl font-bold text-foreground">{user.name}</h2>
                     <p className="text-muted-foreground">
-                      目标：{user.fitnessGoal} {Math.abs(user.targetWeight - user.currentWeight)}公斤
+                      目标：{user.fitnessGoal} {Math.abs(user.targetWeight - user.currentWeight).toFixed(1)}公斤
                     </p>
                   </div>
                 </div>
