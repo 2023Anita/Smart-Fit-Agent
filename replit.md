@@ -115,6 +115,11 @@ Changelog:
 - June 17, 2025. Enhanced progress tracking with real-time weight, steps, and water intake
 - June 17, 2025. Added comprehensive daily weight tracking with historical trends
 - June 17, 2025. Implemented interactive data input for all health metrics
+- June 17, 2025. Integrated food tracking with dashboard calorie intake display
+- June 17, 2025. Added localStorage persistence for tracked meals across navigation
+- June 17, 2025. Implemented dynamic calorie target calculation using BMR/TDEE formulas
+- June 17, 2025. Enhanced meal generation with flexible food combinations and variety
+- June 17, 2025. Added calorie overflow warnings and source breakdown display
 ```
 
 ## User Preferences

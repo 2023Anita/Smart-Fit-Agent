@@ -398,7 +398,43 @@ export default function Dashboard() {
 
   const { weightData, weightLabels, weightTrend } = processWeightData();
 
-  const targetCalories = 2000; // This should be calculated based on user profile
+  // Calculate target calories based on user profile
+  const calculateTargetCalories = (user: any) => {
+    if (!user) return 2000;
+    
+    // Base Metabolic Rate (BMR) calculation using Mifflin-St Jeor Equation
+    let bmr;
+    if (user.gender === '男性') {
+      bmr = 88.362 + (13.397 * user.currentWeight) + (4.799 * user.height) - (5.677 * user.age);
+    } else {
+      bmr = 447.593 + (9.247 * user.currentWeight) + (3.098 * user.height) - (4.330 * user.age);
+    }
+    
+    // Activity factor
+    let activityFactor;
+    switch (user.activityLevel) {
+      case '轻度': activityFactor = 1.375; break;
+      case '中度': activityFactor = 1.55; break;
+      case '高度': activityFactor = 1.725; break;
+      default: activityFactor = 1.2; break;
+    }
+    
+    // Total Daily Energy Expenditure (TDEE)
+    let tdee = bmr * activityFactor;
+    
+    // Adjust based on fitness goal
+    switch (user.fitnessGoal) {
+      case '减重': tdee = tdee - 500; break; // 500 calorie deficit for weight loss
+      case '增重': tdee = tdee + 300; break; // 300 calorie surplus for weight gain
+      case '增肌': tdee = tdee + 200; break; // 200 calorie surplus for muscle gain
+      case '维持': break; // maintain current calories
+      default: break;
+    }
+    
+    return Math.round(tdee);
+  };
+
+  const targetCalories = calculateTargetCalories(user);
   const calorieProgress = (dailyStats.caloriesConsumed / targetCalories) * 100;
 
   return (

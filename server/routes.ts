@@ -331,8 +331,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const targetCalories = dailyCalories + calorieAdjustment;
 
+      // Add randomization to create varied meal plans
+      const currentTime = new Date().getTime();
+      const dayOfWeek = new Date().getDay();
+      const randomSeed = Math.floor(currentTime / (1000 * 60 * 60 * 24)) + dayOfWeek; // Changes daily
+      
       const prompt = `
-        作为专业营养师，为以下用户生成一日健康饮食计划：
+        作为专业营养师，为以下用户生成一日创新多样的健康饮食计划。请确保每次生成的食物搭配都不同，避免重复组合：
         
         用户信息：
         - 年龄：${user.age}岁
@@ -346,35 +351,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         目标卡路里：${targetCalories} kcal
+        随机种子：${randomSeed}（请用此数值来确保生成不同的食物组合）
+        
+        **重要要求：**
+        1. 每次生成都要创造新的食物搭配组合，避免常见的固定搭配
+        2. 混合不同烹饪风格：中式、西式、日式、地中海式等
+        3. 使用季节性食材和创新搭配
+        4. 早餐可以是：overnight oats配奇异果、牛油果土司配水煮蛋、小米粥配蒸蛋、希腊酸奶配坚果等
+        5. 午餐可以是：彩虹沙拉配烤鸡胸、藜麦炒饭、鳕鱼配烤蔬菜、意式蔬菜汤配全麦面包等
+        6. 晚餐可以是：烤三文鱼配红薯、蒸蛋羹配蔬菜、鸡胸肉沙拉、豆腐蔬菜汤等
+        7. 加餐可以是：混合坚果、水果拼盘、蛋白质奶昔、蔬菜条配鹰嘴豆泥等
         
         请生成包含早餐、午餐、晚餐和加餐的完整计划，每餐包含：
-        1. 菜品名称（中文）
-        2. 卡路里
+        1. 创新菜品名称（中文，避免常见搭配）
+        2. 精确卡路里计算
         3. 蛋白质、碳水化合物、脂肪含量（克）
-        4. 主要食材
-        5. 简单制作步骤
+        4. 多样化主要食材（至少3-5种）
+        5. 详细制作步骤（3-4步）
+        
+        营养分配指导：
+        - 蛋白质：总卡路里的25-30%（每克4卡路里）
+        - 碳水化合物：总卡路里的40-45%（每克4卡路里）
+        - 脂肪：总卡路里的25-30%（每克9卡路里）
         
         请以JSON格式返回，格式如下：
         {
           "meals": [
             {
-              "name": "燕麦碗配蓝莓和坚果",
+              "name": "藜麦蓝莓碗配杏仁奶",
               "type": "早餐",
               "calories": 380,
               "protein": 12,
               "carbs": 45,
               "fat": 15,
-              "ingredients": ["燕麦", "蓝莓", "核桃", "牛奶"],
-              "instructions": ["将燕麦用牛奶煮熟", "加入蓝莓和坚果"]
+              "ingredients": ["藜麦", "新鲜蓝莓", "杏仁奶", "奇亚籽", "蜂蜜"],
+              "instructions": ["煮熟藜麦并晾凉", "加入杏仁奶拌匀", "撒上蓝莓和奇亚籽", "淋上少许蜂蜜调味"]
             }
           ],
           "totalCalories": ${targetCalories},
-          "totalProtein": 100,
-          "totalCarbs": 200,
-          "totalFat": 60
+          "totalProtein": ${Math.round(targetCalories * 0.275 / 4)},
+          "totalCarbs": ${Math.round(targetCalories * 0.425 / 4)},
+          "totalFat": ${Math.round(targetCalories * 0.275 / 9)}
         }
         
-        确保营养均衡，符合中国人饮食习惯。
+        确保营养均衡，符合中国人饮食习惯，但要有国际化创新元素。
       `;
 
       const geminiResponse = await generateWithGemini(prompt);
@@ -390,34 +410,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error("No JSON found in response");
         }
       } catch (parseError) {
-        // Fallback meal plan if parsing fails
-        mealData = {
-          meals: [
-            {
-              name: "燕麦碗配蓝莓和坚果",
-              type: "早餐",
-              calories: 380,
-              protein: 12,
-              carbs: 45,
-              fat: 15,
-              ingredients: ["燕麦", "蓝莓", "核桃", "牛奶"],
-              instructions: ["将燕麦用牛奶煮熟", "加入蓝莓和坚果"]
-            },
-            {
-              name: "烤三文鱼配藜麦蔬菜",
-              type: "午餐",
-              calories: 520,
-              protein: 35,
-              carbs: 35,
-              fat: 22,
-              ingredients: ["三文鱼", "藜麦", "西兰花", "胡萝卜"],
-              instructions: ["烤三文鱼15分钟", "藜麦煮熟", "蒸蔬菜"]
-            }
+        // Dynamic fallback meal plan with varied combinations based on target calories
+        const breakfastCal = Math.round(targetCalories * 0.25);
+        const lunchCal = Math.round(targetCalories * 0.35);
+        const dinnerCal = Math.round(targetCalories * 0.30);
+        const snackCal = Math.round(targetCalories * 0.10);
+        
+        // Generate varied meals based on random seed for diversity
+        const mealVariations = [
+          // Breakfast options
+          [
+            { name: "希腊酸奶配坚果莓果", ingredients: ["希腊酸奶", "混合莓果", "杏仁", "蜂蜜", "奇亚籽"] },
+            { name: "牛油果土司配水煮蛋", ingredients: ["全麦面包", "牛油果", "水煮蛋", "番茄", "黑胡椒"] },
+            { name: "小米南瓜粥配坚果", ingredients: ["小米", "南瓜", "核桃", "枸杞", "红枣"] }
           ],
+          // Lunch options
+          [
+            { name: "彩虹沙拉配烤鸡胸", ingredients: ["鸡胸肉", "彩椒", "紫甘蓝", "胡萝卜", "橄榄油"] },
+            { name: "藜麦蔬菜炒饭", ingredients: ["藜麦", "西兰花", "胡萝卜", "豌豆", "鸡蛋"] },
+            { name: "烤鳕鱼配烤蔬菜", ingredients: ["鳕鱼", "芦笋", "甜椒", "洋葱", "柠檬"] }
+          ],
+          // Dinner options
+          [
+            { name: "蒸蛋羹配时蔬", ingredients: ["鸡蛋", "豆腐", "小白菜", "胡萝卜", "香菇"] },
+            { name: "烤三文鱼配红薯", ingredients: ["三文鱼", "红薯", "芦笋", "柠檬", "橄榄油"] },
+            { name: "鸡胸肉蔬菜汤", ingredients: ["鸡胸肉", "冬瓜", "玉米", "胡萝卜", "香菜"] }
+          ],
+          // Snack options
+          [
+            { name: "混合坚果拼盘", ingredients: ["杏仁", "核桃", "腰果", "葡萄干", "无花果干"] },
+            { name: "水果酸奶杯", ingredients: ["低脂酸奶", "苹果", "香蕉", "蓝莓", "燕麦片"] },
+            { name: "蔬菜条配鹰嘴豆泥", ingredients: ["胡萝卜", "黄瓜", "彩椒", "鹰嘴豆", "柠檬汁"] }
+          ]
+        ];
+        
+        const dayIndex = randomSeed % 3;
+        const selectedMeals = [
+          { ...mealVariations[0][dayIndex], type: "早餐", calories: breakfastCal },
+          { ...mealVariations[1][dayIndex], type: "午餐", calories: lunchCal },
+          { ...mealVariations[2][dayIndex], type: "晚餐", calories: dinnerCal },
+          { ...mealVariations[3][dayIndex], type: "加餐", calories: snackCal }
+        ];
+        
+        mealData = {
+          meals: selectedMeals.map(meal => ({
+            ...meal,
+            protein: Math.round(meal.calories * 0.275 / 4),
+            carbs: Math.round(meal.calories * 0.425 / 4),
+            fat: Math.round(meal.calories * 0.275 / 9),
+            instructions: ["按照健康烹饪方式制作", "控制油盐用量", "保持营养均衡", "细嚼慢咽享用"]
+          })),
           totalCalories: targetCalories,
-          totalProtein: Math.round(targetCalories * 0.25 / 4),
-          totalCarbs: Math.round(targetCalories * 0.45 / 4),
-          totalFat: Math.round(targetCalories * 0.30 / 9)
+          totalProtein: Math.round(targetCalories * 0.275 / 4),
+          totalCarbs: Math.round(targetCalories * 0.425 / 4),
+          totalFat: Math.round(targetCalories * 0.275 / 9)
         };
       }
 
