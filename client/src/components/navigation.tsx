@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { User, Activity, Calendar, TrendingUp, Menu, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import logoImage from "@/assets/logo.png";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -37,7 +38,7 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <img 
-                  src="/assets/logo.png" 
+                  src={logoImage} 
                   alt="Smart Fit Agent Logo" 
                   className="w-8 h-8 rounded-lg object-cover"
                 />
