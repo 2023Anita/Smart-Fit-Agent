@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, TrendingUp, Target, Plus } from "lucide-react";
+import { Calendar, TrendingUp, Target, Plus, Camera, Utensils, Sparkles, ChefHat } from "lucide-react";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
@@ -226,18 +226,72 @@ export default function FoodTracking() {
           </CardHeader>
           <CardContent>
             {trackedMeals.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-muted-foreground mb-4">
-                  还没有记录任何餐食
+              <div className="text-center py-16">
+                <div className="relative mx-auto w-32 h-32 mb-8">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-success/20 rounded-full animate-pulse"></div>
+                  <div className="absolute inset-4 bg-gradient-to-br from-primary/10 to-success/10 rounded-full flex items-center justify-center">
+                    <div className="relative">
+                      <Utensils className="h-12 w-12 text-primary" />
+                      <Sparkles className="h-4 w-4 text-success absolute -top-1 -right-1 animate-bounce" />
+                    </div>
+                  </div>
                 </div>
-                <Button
-                  onClick={() => setShowAnalyzer(true)}
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>开始记录</span>
-                </Button>
+                
+                <h3 className="text-xl font-bold text-foreground mb-3">开始您的营养之旅</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  使用AI智能识别技术，拍照即可自动分析食物营养成分，轻松追踪您的健康饮食
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
+                  <Button
+                    onClick={() => setShowAnalyzer(true)}
+                    className="bg-gradient-to-r from-primary to-success hover:from-primary/90 hover:to-success/90 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <Camera className="h-5 w-5 mr-2" />
+                    <span>拍照识别食物</span>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAnalyzer(true)}
+                    className="px-6 py-3 rounded-full border-primary/30 hover:border-primary/50 hover:bg-primary/5"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    <span>手动添加</span>
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                  <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg">
+                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                      <Camera className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-foreground">AI识别</div>
+                      <div className="text-sm text-muted-foreground">智能分析营养</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-success/5 to-success/10 rounded-lg">
+                    <div className="w-10 h-10 bg-success/20 rounded-full flex items-center justify-center">
+                      <Target className="h-5 w-5 text-success" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-foreground">精准追踪</div>
+                      <div className="text-sm text-muted-foreground">详细营养数据</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-accent/5 to-accent/10 rounded-lg">
+                    <div className="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-accent" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-foreground">健康建议</div>
+                      <div className="text-sm text-muted-foreground">个性化推荐</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
