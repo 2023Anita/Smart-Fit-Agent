@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import type { UserProfile, DailyStats } from "@/types";
 
 export default function Dashboard() {
+  const [location, setLocation] = useLocation();
   const [userId] = useState(() => {
     return parseInt(localStorage.getItem("userId") || "1");
   });
@@ -1095,40 +1097,55 @@ export default function Dashboard() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-foreground mb-6">快速操作</h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <Card 
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-br from-background to-accent/5 border-accent/20 hover:border-accent/40"
               onClick={() => updateWaterIntake.mutate(0.25)}
             >
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Droplets className="h-5 w-5 text-accent" />
+                <div className="w-14 h-14 bg-gradient-to-br from-accent/20 to-accent/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Droplets className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="font-medium text-foreground">记录喝水</h3>
-                <p className="text-sm text-muted-foreground mt-1">+250ml</p>
+                <h3 className="font-bold text-foreground mb-1">记录喝水</h3>
+                <p className="text-sm text-muted-foreground">+250ml</p>
+                <div className="mt-3 w-full bg-accent/10 rounded-full h-1.5">
+                  <div 
+                    className="bg-accent h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min((dailyStats.waterIntake / 2000) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-accent mt-2 font-medium">{dailyStats.waterIntake}ml / 2000ml</p>
               </CardContent>
             </Card>
 
             <Card 
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-br from-background to-primary/5 border-primary/20 hover:border-primary/40"
               onClick={() => {
-                const weight = prompt("请输入当前体重(kg):", user.currentWeight?.toString() || "70");
+                const weight = prompt("请输入当前体重(kg):", user?.currentWeight?.toString() || "70");
                 if (weight && !isNaN(Number(weight))) {
                   updateWeight.mutate(Number(weight));
                 }
               }}
             >
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <TrendingUp className="h-5 w-5 text-primary" />
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUp className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="font-medium text-foreground">记录体重</h3>
-                <p className="text-sm text-muted-foreground mt-1">每日测量</p>
+                <h3 className="font-bold text-foreground mb-1">记录体重</h3>
+                <p className="text-sm text-muted-foreground">每日测量</p>
+                <div className="mt-3 flex items-center justify-center space-x-2">
+                  <span className="text-lg font-bold text-primary">
+                    {dailyStats.weight || user?.currentWeight || 0}kg
+                  </span>
+                </div>
+                <p className="text-xs text-primary mt-1 font-medium">
+                  目标: {user?.targetWeight}kg
+                </p>
               </CardContent>
             </Card>
 
             <Card 
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-br from-background to-secondary/5 border-secondary/20 hover:border-secondary/40"
               onClick={() => {
                 const steps = prompt("请输入今日步数:", dailyStats.steps.toString());
                 if (steps && !isNaN(Number(steps))) {
@@ -1137,21 +1154,36 @@ export default function Dashboard() {
               }}
             >
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Footprints className="h-5 w-5 text-secondary" />
+                <div className="w-14 h-14 bg-gradient-to-br from-secondary/20 to-secondary/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Footprints className="h-6 w-6 text-secondary" />
                 </div>
-                <h3 className="font-medium text-foreground">记录步数</h3>
-                <p className="text-sm text-muted-foreground mt-1">输入步数</p>
+                <h3 className="font-bold text-foreground mb-1">记录步数</h3>
+                <p className="text-sm text-muted-foreground">今日活动</p>
+                <div className="mt-3 w-full bg-secondary/10 rounded-full h-1.5">
+                  <div 
+                    className="bg-secondary h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min((dailyStats.steps / 10000) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-secondary mt-2 font-medium">{dailyStats.steps.toLocaleString()} / 10,000</p>
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card 
+              className="group cursor-pointer hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 bg-gradient-to-br from-background to-success/5 border-success/20 hover:border-success/40"
+              onClick={() => setLocation('/food-tracking')}
+            >
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Plus className="h-5 w-5 text-success" />
+                <div className="w-14 h-14 bg-gradient-to-br from-success/20 to-success/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Camera className="h-6 w-6 text-success" />
                 </div>
-                <h3 className="font-medium text-foreground">添加食物</h3>
-                <p className="text-sm text-muted-foreground mt-1">手动记录</p>
+                <h3 className="font-bold text-foreground mb-1">拍照识别</h3>
+                <p className="text-sm text-muted-foreground">AI营养分析</p>
+                <div className="mt-3 flex items-center justify-center">
+                  <div className="w-2 h-2 bg-success rounded-full mr-2 animate-pulse"></div>
+                  <span className="text-xs text-success font-medium">智能识别</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">点击进入拍照页面</p>
               </CardContent>
             </Card>
           </div>
