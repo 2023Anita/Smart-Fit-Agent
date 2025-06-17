@@ -12,6 +12,8 @@ import {
   type DailyProgress,
   type InsertDailyProgress
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, between } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -36,182 +38,115 @@ export interface IStorage {
   getWeeklyProgress(userId: number, startDate: string, endDate: string): Promise<DailyProgress[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private mealPlans: Map<number, MealPlan>;
-  private workoutPlans: Map<number, WorkoutPlan>;
-  private dailyProgress: Map<number, DailyProgress>;
-  private currentUserId: number;
-  private currentMealPlanId: number;
-  private currentWorkoutPlanId: number;
-  private currentProgressId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.mealPlans = new Map();
-    this.workoutPlans = new Map();
-    this.dailyProgress = new Map();
-    this.currentUserId = 1;
-    this.currentMealPlanId = 1;
-    this.currentWorkoutPlanId = 1;
-    this.currentProgressId = 1;
-    
-    // Create a default user for testing
-    this.initializeDefaultUser();
-  }
-
-  private async initializeDefaultUser() {
-    const defaultUser = {
-      name: "测试用户",
-      age: 25,
-      gender: "男性" as const,
-      height: 175,
-      currentWeight: 70,
-      targetWeight: 65,
-      activityLevel: "中度" as const,
-      fitnessGoal: "减重" as const,
-      dietaryPreferences: [] as string[],
-      medicalConditions: [] as string[]
-    };
-    await this.createUser(defaultUser);
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const now = new Date();
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      createdAt: now,
-      updatedAt: now,
-      dietaryPreferences: insertUser.dietaryPreferences || [],
-      medicalConditions: insertUser.medicalConditions || []
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    
-    const updatedUser: User = {
-      ...user,
-      ...updates,
-      updatedAt: new Date()
-    };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [user] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async getMealPlan(userId: number, date: string): Promise<MealPlan | undefined> {
-    return Array.from(this.mealPlans.values()).find(
-      plan => plan.userId === userId && plan.date === date
-    );
+    const [mealPlan] = await db
+      .select()
+      .from(mealPlans)
+      .where(and(eq(mealPlans.userId, userId), eq(mealPlans.date, date)));
+    return mealPlan || undefined;
   }
 
   async createMealPlan(insertMealPlan: InsertMealPlan): Promise<MealPlan> {
-    const id = this.currentMealPlanId++;
-    const mealPlan: MealPlan = {
-      ...insertMealPlan,
-      id,
-      createdAt: new Date(),
-      aiGenerated: insertMealPlan.aiGenerated ?? true
-    };
-    this.mealPlans.set(id, mealPlan);
+    const [mealPlan] = await db
+      .insert(mealPlans)
+      .values(insertMealPlan)
+      .returning();
     return mealPlan;
   }
 
   async updateMealPlan(id: number, updates: Partial<InsertMealPlan>): Promise<MealPlan | undefined> {
-    const mealPlan = this.mealPlans.get(id);
-    if (!mealPlan) return undefined;
-    
-    const updatedMealPlan: MealPlan = {
-      ...mealPlan,
-      ...updates
-    };
-    this.mealPlans.set(id, updatedMealPlan);
-    return updatedMealPlan;
+    const [mealPlan] = await db
+      .update(mealPlans)
+      .set(updates)
+      .where(eq(mealPlans.id, id))
+      .returning();
+    return mealPlan || undefined;
   }
 
   async getWorkoutPlan(userId: number, date: string): Promise<WorkoutPlan | undefined> {
-    return Array.from(this.workoutPlans.values()).find(
-      plan => plan.userId === userId && plan.date === date
-    );
+    const [workoutPlan] = await db
+      .select()
+      .from(workoutPlans)
+      .where(and(eq(workoutPlans.userId, userId), eq(workoutPlans.date, date)));
+    return workoutPlan || undefined;
   }
 
   async createWorkoutPlan(insertWorkoutPlan: InsertWorkoutPlan): Promise<WorkoutPlan> {
-    const id = this.currentWorkoutPlanId++;
-    const workoutPlan: WorkoutPlan = {
-      ...insertWorkoutPlan,
-      id,
-      createdAt: new Date(),
-      aiGenerated: insertWorkoutPlan.aiGenerated ?? true
-    };
-    this.workoutPlans.set(id, workoutPlan);
+    const [workoutPlan] = await db
+      .insert(workoutPlans)
+      .values(insertWorkoutPlan)
+      .returning();
     return workoutPlan;
   }
 
   async updateWorkoutPlan(id: number, updates: Partial<InsertWorkoutPlan>): Promise<WorkoutPlan | undefined> {
-    const workoutPlan = this.workoutPlans.get(id);
-    if (!workoutPlan) return undefined;
-    
-    const updatedWorkoutPlan: WorkoutPlan = {
-      ...workoutPlan,
-      ...updates
-    };
-    this.workoutPlans.set(id, updatedWorkoutPlan);
-    return updatedWorkoutPlan;
+    const [workoutPlan] = await db
+      .update(workoutPlans)
+      .set(updates)
+      .where(eq(workoutPlans.id, id))
+      .returning();
+    return workoutPlan || undefined;
   }
 
   async getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined> {
-    return Array.from(this.dailyProgress.values()).find(
-      progress => progress.userId === userId && progress.date === date
-    );
+    const [progress] = await db
+      .select()
+      .from(dailyProgress)
+      .where(and(eq(dailyProgress.userId, userId), eq(dailyProgress.date, date)));
+    return progress || undefined;
   }
 
   async createDailyProgress(insertProgress: InsertDailyProgress): Promise<DailyProgress> {
-    const id = this.currentProgressId++;
-    const progress: DailyProgress = {
-      ...insertProgress,
-      id,
-      createdAt: new Date(),
-      weight: insertProgress.weight ?? null,
-      waterIntake: insertProgress.waterIntake ?? 0,
-      steps: insertProgress.steps ?? 0,
-      caloriesConsumed: insertProgress.caloriesConsumed ?? 0,
-      caloriesBurned: insertProgress.caloriesBurned ?? 0,
-      exercisesCompleted: insertProgress.exercisesCompleted ?? [],
-      mealsCompleted: insertProgress.mealsCompleted ?? []
-    };
-    this.dailyProgress.set(id, progress);
+    const [progress] = await db
+      .insert(dailyProgress)
+      .values(insertProgress)
+      .returning();
     return progress;
   }
 
   async updateDailyProgress(id: number, updates: Partial<InsertDailyProgress>): Promise<DailyProgress | undefined> {
-    const progress = this.dailyProgress.get(id);
-    if (!progress) return undefined;
-    
-    const updatedProgress: DailyProgress = {
-      ...progress,
-      ...updates
-    };
-    this.dailyProgress.set(id, updatedProgress);
-    return updatedProgress;
+    const [progress] = await db
+      .update(dailyProgress)
+      .set(updates)
+      .where(eq(dailyProgress.id, id))
+      .returning();
+    return progress || undefined;
   }
 
   async getWeeklyProgress(userId: number, startDate: string, endDate: string): Promise<DailyProgress[]> {
-    return Array.from(this.dailyProgress.values()).filter(
-      progress => 
-        progress.userId === userId && 
-        progress.date >= startDate && 
-        progress.date <= endDate
-    );
+    return await db
+      .select()
+      .from(dailyProgress)
+      .where(
+        and(
+          eq(dailyProgress.userId, userId),
+          between(dailyProgress.date, startDate, endDate)
+        )
+      );
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

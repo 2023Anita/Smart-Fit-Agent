@@ -106,21 +106,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? 88.362 + (13.397 * user.currentWeight) + (4.799 * user.height) - (5.677 * user.age)
         : 447.593 + (9.247 * user.currentWeight) + (3.098 * user.height) - (4.330 * user.age);
       
-      const activityMultiplier = {
-        "轻度": 1.2,
-        "中度": 1.55,
-        "高度": 1.9
-      }[user.activityLevel] || 1.2;
+      const activityMultiplier = user.activityLevel === "轻度" ? 1.2 :
+                                 user.activityLevel === "中度" ? 1.55 :
+                                 user.activityLevel === "高度" ? 1.9 : 1.2;
 
       const dailyCalories = Math.round(bmr * activityMultiplier);
       
       // Adjust for weight goal
-      const calorieAdjustment = {
-        "减重": -500,
-        "增重": 500,
-        "增肌": 300,
-        "维持": 0
-      }[user.fitnessGoal] || 0;
+      const calorieAdjustment = user.fitnessGoal === "减重" ? -500 :
+                                user.fitnessGoal === "增重" ? 500 :
+                                user.fitnessGoal === "增肌" ? 300 : 0;
 
       const targetCalories = dailyCalories + calorieAdjustment;
 
