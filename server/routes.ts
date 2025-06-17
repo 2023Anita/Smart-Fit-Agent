@@ -134,11 +134,59 @@ function generateMealSVG(mealName: string, mealType: string, ingredients: string
   `.trim();
 }
 
-// Gemini Image Generation (fallback to SVG if API fails)
+// Image Generation using ssopen.top API with flux.1.1-pro
 async function generateMealImage(mealName: string, ingredients: string[], mealType: string): Promise<string | undefined> {
-  // Return SVG illustration with proper parameters
-  const svgContent = generateMealSVG(mealName, mealType, ingredients);
-  return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  
+  if (!apiKey) {
+    console.warn("API key not found for image generation, using SVG fallback");
+    const svgContent = generateMealSVG(mealName, mealType, ingredients);
+    return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+  }
+
+  try {
+    const prompt = `Studio Ghibli style illustration of ${mealName}, featuring ${ingredients.join(', ')}. Warm, cozy atmosphere with soft lighting, detailed food presentation, hand-drawn animation style reminiscent of Spirited Away and Howl's Moving Castle. Beautiful, appetizing, artistically arranged on a plate.`;
+    
+    const response = await fetch('https://api.ssopen.top/api/generate-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'flux.1.1-pro',
+        prompt: prompt,
+        width: 512,
+        height: 384,
+        steps: 20,
+        guidance_scale: 7.5
+      })
+    });
+
+    if (!response.ok) {
+      console.warn(`Image generation API error: ${response.status}`);
+      // Fallback to SVG
+      const svgContent = generateMealSVG(mealName, mealType, ingredients);
+      return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+    }
+
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.image_url) {
+      return data.data.image_url;
+    } else if (data.image) {
+      return data.image;
+    } else {
+      // Fallback to SVG if API response format is unexpected
+      const svgContent = generateMealSVG(mealName, mealType, ingredients);
+      return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+    }
+  } catch (error) {
+    console.warn('Image generation error:', error);
+    // Fallback to SVG
+    const svgContent = generateMealSVG(mealName, mealType, ingredients);
+    return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
