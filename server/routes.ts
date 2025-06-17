@@ -289,6 +289,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email-based user lookup for authentication
+  app.get("/api/users/by-email/:email", async (req, res) => {
+    try {
+      const email = decodeURIComponent(req.params.email);
+      
+      // Demo user mapping for existing accounts
+      const demoUsers = new Map([
+        ['demo@smartfit.com', 1],
+        ['user1@demo.com', 1], 
+        ['user2@demo.com', 2]
+      ]);
+      
+      if (demoUsers.has(email)) {
+        const userId = demoUsers.get(email);
+        const user = await storage.getUser(userId!);
+        if (user) {
+          res.json(user);
+          return;
+        }
+      }
+      
+      // Create new isolated user account for new email
+      const newUser = await storage.createUser({
+        email: email,
+        passwordHash: 'placeholder',
+        name: `用户_${email.split('@')[0]}`,
+        age: 25,
+        gender: '男性',
+        height: 170,
+        currentWeight: 70,
+        targetWeight: 65,
+        activityLevel: '中度',
+        fitnessGoal: '减重',
+        dietaryPreferences: [],
+        medicalConditions: [],
+        isEmailVerified: true,
+        emailVerificationToken: null,
+        passwordResetToken: null,
+        passwordResetExpires: null
+      });
+      
+      res.json(newUser);
+    } catch (error) {
+      console.error('User lookup error:', error);
+      res.status(500).json({ error: "Failed to find or create user" });
+    }
+  });
+
   app.put("/api/users/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

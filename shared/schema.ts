@@ -66,6 +66,7 @@ export const dailyProgress = pgTable("daily_progress", {
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
+  email: true,
   passwordHash: true,
   isEmailVerified: true,
   emailVerificationToken: true,
