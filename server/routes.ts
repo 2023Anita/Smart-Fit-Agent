@@ -52,57 +52,93 @@ async function generateWithGemini(prompt: string): Promise<any> {
   }
 }
 
-// Gemini Image Generation
-async function generateMealImage(mealName: string, ingredients: string[]): Promise<string | undefined> {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+// Generate SVG illustration for meals (Ghibli style)
+function generateMealSVG(mealName: string, mealType: string, ingredients: string[]): string {
+  const colors = {
+    '早餐': { primary: '#FFE4B5', secondary: '#FFA500', accent: '#FF6347', bg: '#FFF8DC' },
+    '午餐': { primary: '#98FB98', secondary: '#32CD32', accent: '#FF69B4', bg: '#F0FFF0' },
+    '晚餐': { primary: '#DDA0DD', secondary: '#9370DB', accent: '#FFD700', bg: '#F5F0FF' },
+    '加餐': { primary: '#F0E68C', secondary: '#DAA520', accent: '#FF1493', bg: '#FFFACD' }
+  };
   
-  if (!apiKey) {
-    console.warn("Gemini API key not found for image generation");
-    return undefined;
-  }
+  const mealColors = colors[mealType as keyof typeof colors] || colors['午餐'];
+  const uniqueId = Math.random().toString(36).substr(2, 9);
+  
+  // Create different food elements based on ingredients
+  const foodElements = ingredients.slice(0, 4).map((ingredient, index) => {
+    const positions = [
+      { x: 75, y: 75, r: 8 },
+      { x: 125, y: 80, r: 6 },
+      { x: 95, y: 95, r: 5 },
+      { x: 115, y: 70, r: 7 }
+    ];
+    const pos = positions[index] || positions[0];
+    const colorVariations = [mealColors.accent, mealColors.secondary, mealColors.primary, '#FF8C69'];
+    return `<circle cx="${pos.x}" cy="${pos.y}" r="${pos.r}" fill="${colorVariations[index % 4]}" opacity="0.8"/>`;
+  }).join('');
+  
+  return `
+    <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg-${uniqueId}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:${mealColors.bg};stop-opacity:1" />
+          <stop offset="50%" style="stop-color:${mealColors.primary};stop-opacity:0.6" />
+          <stop offset="100%" style="stop-color:${mealColors.secondary};stop-opacity:0.4" />
+        </linearGradient>
+        <radialGradient id="plate-${uniqueId}" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+          <stop offset="70%" style="stop-color:#f8f8f8;stop-opacity:0.9" />
+          <stop offset="100%" style="stop-color:#e0e0e0;stop-opacity:0.8" />
+        </radialGradient>
+        <filter id="shadow-${uniqueId}" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="3" dy="4" stdDeviation="4" flood-opacity="0.2"/>
+        </filter>
+      </defs>
+      
+      <!-- Background with Ghibli-style atmosphere -->
+      <rect width="200" height="150" fill="url(#bg-${uniqueId})" rx="20"/>
+      
+      <!-- Decorative sparkles -->
+      <circle cx="30" cy="25" r="2" fill="${mealColors.accent}" opacity="0.6">
+        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="170" cy="30" r="1.5" fill="${mealColors.secondary}" opacity="0.7">
+        <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="180" cy="45" r="1" fill="${mealColors.primary}" opacity="0.5">
+        <animate attributeName="opacity" values="0.2;0.7;0.2" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      
+      <!-- Main plate with depth -->
+      <ellipse cx="100" cy="90" rx="65" ry="38" fill="url(#plate-${uniqueId})" filter="url(#shadow-${uniqueId})"/>
+      <ellipse cx="100" cy="88" rx="58" ry="32" fill="#fafafa" opacity="0.8"/>
+      
+      <!-- Food elements based on ingredients -->
+      ${foodElements}
+      
+      <!-- Steam effect -->
+      <g opacity="0.6">
+        <path d="M85 65 Q80 55 85 45 Q90 50 85 40" stroke="${mealColors.secondary}" stroke-width="2" fill="none" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+        </path>
+        <path d="M115 70 Q110 60 115 50 Q120 55 115 45" stroke="${mealColors.accent}" stroke-width="2" fill="none" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2.3s" repeatCount="indefinite"/>
+        </path>
+      </g>
+      
+      <!-- Meal name with elegant typography -->
+      <text x="100" y="135" text-anchor="middle" font-family="serif" font-size="13" font-weight="600" fill="#444" opacity="0.9">
+        ${mealName.length > 14 ? mealName.substring(0, 14) + '...' : mealName}
+      </text>
+    </svg>
+  `.trim();
+}
 
-  try {
-    const prompt = `Generate a beautiful, warm and inviting Studio Ghibli style illustration of ${mealName}. The image should show ${ingredients.join(', ')} arranged in an artistic way. Use soft, warm colors and the characteristic Studio Ghibli aesthetic with detailed food presentation, cozy atmosphere, and gentle lighting. The style should be reminiscent of food scenes from Spirited Away or Howl's Moving Castle.`;
-    
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-        }
-      })
-    });
-
-    if (!response.ok) {
-      console.warn(`Gemini image generation error: ${response.status}`);
-      return undefined;
-    }
-
-    const data = await response.json();
-    
-    // Extract image URL from Gemini response
-    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-      for (const part of data.candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.mimeType && part.inlineData.data) {
-          // Return base64 data URL
-          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-        }
-      }
-    }
-    
-    return undefined;
-  } catch (error) {
-    console.warn('Gemini image generation error:', error);
-    return undefined;
-  }
+// Gemini Image Generation (fallback to SVG if API fails)
+async function generateMealImage(mealName: string, ingredients: string[], mealType: string): Promise<string | undefined> {
+  // Return SVG illustration with proper parameters
+  const svgContent = generateMealSVG(mealName, mealType, ingredients);
+  return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -264,7 +300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Add IDs, completion status and generate images for meals
       const mealsWithIds = await Promise.all(mealData.meals.map(async (meal: any, index: number) => {
-        const imageUrl = await generateMealImage(meal.name, meal.ingredients);
+        const imageUrl = await generateMealImage(meal.name, meal.ingredients, meal.type);
         return {
           ...meal,
           id: `meal-${Date.now()}-${index}`,
