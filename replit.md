@@ -121,6 +121,8 @@ Changelog:
 - June 17, 2025. Enhanced meal generation with flexible food combinations and variety
 - June 17, 2025. Added calorie overflow warnings and source breakdown display
 - June 17, 2025. Updated application branding to "Smart Fit Agent"
+- June 17, 2025. Implemented step-based calorie calculation (0.04 cal/step) integrated into total calories burned
+- June 17, 2025. Added detailed calorie breakdown showing workout calories + step calories separately
 ```
 
 ## User Preferences

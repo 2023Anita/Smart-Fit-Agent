@@ -347,9 +347,14 @@ export default function Dashboard() {
   const mealPlanCalories = mealPlan?.meals.filter((m: any) => m.completed).reduce((sum: number, m: any) => sum + m.calories, 0) || 0;
   const totalCaloriesConsumed = mealPlanCalories + trackedMealsCalories;
   
+  // Calculate calories burned from workouts and steps
+  const workoutCalories = workoutPlan?.exercises.filter((e: any) => e.completed).reduce((sum: number, e: any) => sum + e.calories, 0) || 0;
+  const stepCalories = Math.round((dailyProgress?.steps || 0) * 0.04); // ~0.04 calories per step
+  const totalCaloriesBurned = workoutCalories + stepCalories;
+  
   const dailyStats: DailyStats = {
     caloriesConsumed: totalCaloriesConsumed,
-    caloriesBurned: workoutPlan?.exercises.filter((e: any) => e.completed).reduce((sum: number, e: any) => sum + e.calories, 0) || 0,
+    caloriesBurned: totalCaloriesBurned,
     waterIntake: dailyProgress?.waterIntake || 0,
     steps: dailyProgress?.steps || 0,
     weight: currentWeight,
@@ -486,6 +491,9 @@ export default function Dashboard() {
                       {dailyStats.caloriesBurned}
                     </div>
                     <div className="text-sm text-muted-foreground">消耗(kcal)</div>
+                    <div className="text-xs text-success/70 mt-1">
+                      运动{workoutCalories} + 步行{stepCalories}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -683,6 +691,9 @@ export default function Dashboard() {
                   <div className="text-center">
                     <div className="text-3xl font-bold text-foreground">
                       {dailyStats.steps.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-accent font-medium">
+                      消耗 {Math.round(dailyStats.steps * 0.04)} 卡路里
                     </div>
                   </div>
                   <Progress value={(dailyStats.steps / 10000) * 100} className="h-2" />
