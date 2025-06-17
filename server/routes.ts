@@ -331,10 +331,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const targetCalories = dailyCalories + calorieAdjustment;
 
-      // Add randomization to create varied meal plans
+      // Add true randomization to create varied meal plans
       const currentTime = new Date().getTime();
       const dayOfWeek = new Date().getDay();
-      const randomSeed = Math.floor(currentTime / (1000 * 60 * 60 * 24)) + dayOfWeek; // Changes daily
+      const userHash = userId.toString();
+      const randomSeed = Math.floor(currentTime / (1000 * 60 * 60)) + dayOfWeek + parseInt(userHash); // Changes hourly for more variety
       
       const prompt = `
         作为专业营养师，为以下用户生成一日创新多样的健康饮食计划。请确保每次生成的食物搭配都不同，避免重复组合：
@@ -351,16 +352,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         目标卡路里：${targetCalories} kcal
-        随机种子：${randomSeed}（请用此数值来确保生成不同的食物组合）
+        随机种子：${randomSeed}（请基于此数值创造完全不同的食物组合，确保高度随机性）
         
         **重要要求：**
-        1. 每次生成都要创造新的食物搭配组合，避免常见的固定搭配
-        2. 混合不同烹饪风格：中式、西式、日式、地中海式等
-        3. 使用季节性食材和创新搭配
-        4. 早餐可以是：overnight oats配奇异果、牛油果土司配水煮蛋、小米粥配蒸蛋、希腊酸奶配坚果等
-        5. 午餐可以是：彩虹沙拉配烤鸡胸、藜麦炒饭、鳕鱼配烤蔬菜、意式蔬菜汤配全麦面包等
-        6. 晚餐可以是：烤三文鱼配红薯、蒸蛋羹配蔬菜、鸡胸肉沙拉、豆腐蔬菜汤等
-        7. 加餐可以是：混合坚果、水果拼盘、蛋白质奶昔、蔬菜条配鹰嘴豆泥等
+        1. 每次生成必须创造全新的食物搭配，严格避免重复组合
+        2. 融合多元烹饪风格：中式传统、日式健康、地中海、北欧、东南亚等
+        3. 创新性食材搭配：超级食物、时令蔬果、植物蛋白、功能性食材
+        4. 早餐创新：紫薯燕麦杯、鳄梨藜麦碗、奇亚籽布丁配浆果、日式茶泡饭、地中海蔬菜煎蛋等
+        5. 午餐多样：彩虹Buddha碗、韩式拌饭、意式藜麦沙拉、泰式柠檬草汤、摩洛哥扁豆炖菜等
+        6. 晚餐精选：味噌烤茄子配糙米、地中海烤鱼配藜麦、印度香料鸡胸、北欧三文鱼配根茎蔬菜等
+        7. 加餐健康：自制能量球、发酵蔬菜、坚果黄油配苹果、绿茶抹茶拿铁、椰子酸奶杯等
+        8. 使用随机种子${randomSeed % 100}来选择不同的食材组合库
         
         请生成包含早餐、午餐、晚餐和加餐的完整计划，每餐包含：
         1. 创新菜品名称（中文，避免常见搭配）
@@ -721,6 +723,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Meal photo analysis error:', error);
       res.status(500).json({ error: "Failed to analyze meal photo" });
+    }
+  });
+
+  // AI Chat endpoint
+  app.post("/api/ai-chat", async (req, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: "消息内容是必需的" });
+      }
+
+      const chatPrompt = `
+        你是Smart Fit Agent的专业健康顾问AI助手。请用温馨、专业、有帮助的语调回答用户的健康相关问题。
+
+        用户问题：${message}
+
+        请提供：
+        1. 专业而易懂的回答
+        2. 实用的建议或tips
+        3. 鼓励性的语言
+        4. 如果涉及严重健康问题，建议咨询医生
+
+        回答要求：
+        - 用中文回答
+        - 语言温暖亲切
+        - 内容准确专业
+        - 长度适中（100-300字）
+        - 避免过于医学化的术语
+      `;
+
+      const response = await generateWithGemini(chatPrompt);
+      
+      // Extract the actual response text
+      let cleanResponse = response;
+      if (typeof response === 'object' && response.response) {
+        cleanResponse = response.response;
+      }
+      
+      res.json({ response: cleanResponse });
+    } catch (error) {
+      console.error("AI chat error:", error);
+      res.status(500).json({ 
+        response: "抱歉，我现在有点忙碌。请稍后再试，或者您可以先查看应用中的健康建议。" 
+      });
     }
   });
 
