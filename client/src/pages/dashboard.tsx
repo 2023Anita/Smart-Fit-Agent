@@ -165,6 +165,83 @@ export default function Dashboard() {
     });
   };
 
+  // Update water intake
+  const updateWaterIntake = useMutation({
+    mutationFn: async (amount: number) => {
+      const currentIntake = dailyProgress?.waterIntake || 0;
+      const newIntake = Math.max(0, currentIntake + amount);
+      
+      if (dailyProgress) {
+        const response = await apiRequest("PATCH", `/api/daily-progress/${dailyProgress.id}`, {
+          waterIntake: newIntake,
+        });
+        return response.json();
+      } else {
+        const response = await apiRequest("POST", "/api/daily-progress", {
+          userId,
+          date: today,
+          waterIntake: newIntake,
+          steps: 0,
+          weight: user.currentWeight,
+        });
+        return response.json();
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+    },
+  });
+
+  // Update steps
+  const updateSteps = useMutation({
+    mutationFn: async (steps: number) => {
+      if (dailyProgress) {
+        const response = await apiRequest("PATCH", `/api/daily-progress/${dailyProgress.id}`, {
+          steps: steps,
+        });
+        return response.json();
+      } else {
+        const response = await apiRequest("POST", "/api/daily-progress", {
+          userId,
+          date: today,
+          waterIntake: 0,
+          steps: steps,
+          weight: user.currentWeight,
+        });
+        return response.json();
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+    },
+  });
+
+  // Update weight
+  const updateWeight = useMutation({
+    mutationFn: async (weight: number) => {
+      if (dailyProgress) {
+        const response = await apiRequest("PATCH", `/api/daily-progress/${dailyProgress.id}`, {
+          weight: weight,
+        });
+        return response.json();
+      } else {
+        const response = await apiRequest("POST", "/api/daily-progress", {
+          userId,
+          date: today,
+          waterIntake: 0,
+          steps: 0,
+          weight: weight,
+        });
+        return response.json();
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+      // Also update user's current weight
+      queryClient.invalidateQueries({ queryKey: ["/api/users", userId] });
+    },
+  });
+
   if (userLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -366,7 +443,7 @@ export default function Dashboard() {
                     {Array.from({ length: 8 }).map((_, i) => (
                       <div
                         key={i}
-                        className={`w-4 h-8 rounded-sm ${
+                        className={`w-4 h-8 rounded-sm transition-colors ${
                           i < Math.floor(dailyStats.waterIntake * 4)
                             ? 'bg-accent'
                             : 'bg-gray-200'
@@ -379,6 +456,35 @@ export default function Dashboard() {
                       {dailyStats.waterIntake.toFixed(1)}L
                     </div>
                     <div className="text-sm text-muted-foreground">目标: 2.0L</div>
+                  </div>
+                  <div className="flex justify-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateWaterIntake.mutate(0.25)}
+                      disabled={updateWaterIntake.isPending}
+                      className="text-xs"
+                    >
+                      +250ml
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateWaterIntake.mutate(0.5)}
+                      disabled={updateWaterIntake.isPending}
+                      className="text-xs"
+                    >
+                      +500ml
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateWaterIntake.mutate(-0.25)}
+                      disabled={updateWaterIntake.isPending}
+                      className="text-xs"
+                    >
+                      -250ml
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -701,7 +807,10 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold text-foreground mb-6">快速操作</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => updateWaterIntake.mutate(0.25)}
+            >
               <CardContent className="p-6 text-center">
                 <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Droplets className="h-5 w-5 text-accent" />
