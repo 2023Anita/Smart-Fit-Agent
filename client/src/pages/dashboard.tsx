@@ -16,7 +16,9 @@ import {
   Target,
   Utensils,
   Dumbbell,
-  Camera
+  Camera,
+  Check,
+  Clock
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -24,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MealCard } from "@/components/meal-card";
 import { WorkoutCard } from "@/components/workout-card";
 import { ProgressChart } from "@/components/progress-chart";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { UserProfile, DailyStats } from "@/types";
 
 export default function Dashboard() {
@@ -429,15 +432,131 @@ export default function Dashboard() {
               </div>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {mealPlan.meals.map((meal: any) => (
-                <MealCard
-                  key={meal.id}
-                  meal={meal}
-                  onToggleComplete={toggleMealComplete}
-                />
-              ))}
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>今日餐食安排</span>
+                  <Badge variant="outline">
+                    已完成 {mealPlan.meals.filter((m: any) => m.completed).length}/{mealPlan.meals.length}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[100px]">状态</TableHead>
+                      <TableHead>餐次</TableHead>
+                      <TableHead>菜品名称</TableHead>
+                      <TableHead className="text-center">卡路里</TableHead>
+                      <TableHead className="text-center">蛋白质</TableHead>
+                      <TableHead className="text-center">碳水</TableHead>
+                      <TableHead className="text-center">脂肪</TableHead>
+                      <TableHead className="text-right">操作</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mealPlan.meals.map((meal: any) => (
+                      <TableRow key={meal.id} className={meal.completed ? "bg-muted/30" : ""}>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleMealComplete(meal.id)}
+                            className={`w-8 h-8 p-0 rounded-full ${
+                              meal.completed 
+                                ? "bg-success text-white hover:bg-success/80" 
+                                : "bg-muted hover:bg-muted/80"
+                            }`}
+                          >
+                            {meal.completed ? (
+                              <Check className="h-4 w-4" />
+                            ) : (
+                              <Clock className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant="secondary"
+                            className={`
+                              ${meal.type === '早餐' ? 'bg-amber-100 text-amber-800' : ''}
+                              ${meal.type === '午餐' ? 'bg-blue-100 text-blue-800' : ''}
+                              ${meal.type === '晚餐' ? 'bg-purple-100 text-purple-800' : ''}
+                              ${meal.type === '加餐' ? 'bg-green-100 text-green-800' : ''}
+                            `}
+                          >
+                            {meal.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{meal.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {meal.ingredients.slice(0, 3).join(', ')}
+                              {meal.ingredients.length > 3 && '...'}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="font-medium text-secondary">{meal.calories}</span>
+                          <div className="text-xs text-muted-foreground">kcal</div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="font-medium text-primary">{meal.protein}g</span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="font-medium text-accent">{meal.carbs}g</span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="font-medium text-success">{meal.fat}g</span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {meal.imageUrl && (
+                            <img 
+                              src={meal.imageUrl} 
+                              alt={meal.name}
+                              className="w-12 h-12 rounded-lg object-cover inline-block"
+                            />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                
+                {/* Nutrition Summary */}
+                <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg">
+                  <h4 className="font-semibold mb-3">今日营养摄入总计</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-secondary">
+                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.calories, 0)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">总卡路里</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">
+                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.protein, 0)}g
+                      </div>
+                      <div className="text-sm text-muted-foreground">蛋白质</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-accent">
+                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.carbs, 0)}g
+                      </div>
+                      <div className="text-sm text-muted-foreground">碳水化合物</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-success">
+                        {mealPlan.meals.reduce((sum: number, meal: any) => sum + meal.fat, 0)}g
+                      </div>
+                      <div className="text-sm text-muted-foreground">脂肪</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </section>
 
