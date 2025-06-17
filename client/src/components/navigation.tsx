@@ -7,6 +7,15 @@ import logoImage from "@assets/Sleep Magician - Illustrative Character Logo_1750
 
 export function Navigation() {
   const [location, setLocation] = useLocation();
+  const userEmail = localStorage.getItem('userEmail') || '用户';
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('trackedMeals');
+    setLocation('/login');
+  };
 
   const navItems = [
     { path: "/", label: "仪表盘", icon: Activity },
@@ -96,7 +105,7 @@ export function Navigation() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>我的账户</DropdownMenuLabel>
+                    <DropdownMenuLabel>{userEmail}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setLocation('/profile')}>
                       <Settings className="mr-2 h-4 w-4" />
@@ -108,11 +117,7 @@ export function Navigation() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                      onClick={() => {
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('userId');
-                        window.location.href = '/login';
-                      }}
+                      onClick={handleLogout}
                       className="text-destructive focus:text-destructive"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
