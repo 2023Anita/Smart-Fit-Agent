@@ -101,9 +101,9 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
           })}
         </div>
         
-        <div className="flex justify-between text-sm font-mono">
+        <div className="flex justify-between text-lg font-mono mt-2">
           {labels.map((label, index) => (
-            <span key={index} className="text-center text-white font-bold hover:text-cyan-100 transition-colors drop-shadow-[0_0_4px_rgba(255,255,255,0.7)]">
+            <span key={index} className="text-center text-black font-black bg-white/95 px-2 py-1 rounded-md shadow-lg hover:bg-cyan-100 transition-all border border-gray-300">
               {label}
             </span>
           ))}

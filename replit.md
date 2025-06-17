@@ -134,6 +134,7 @@ Changelog:
 - June 17, 2025. Enhanced progress charts with cyberpunk-style visual effects, animated bars, and interactive hover states
 - June 17, 2025. Improved progress chart readability with larger, brighter text and enhanced contrast
 - June 17, 2025. Enhanced date labels with white text and glow effects for maximum visibility
+- June 17, 2025. Redesigned date labels with large black text on white background for maximum contrast and readability
 ```
 
 ## User Preferences
