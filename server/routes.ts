@@ -135,8 +135,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 目标体重：${user.targetWeight}kg
         - 健身目标：${user.fitnessGoal}
         - 活动水平：${user.activityLevel}
-        - 饮食偏好：${user.dietaryPreferences.join(', ') || '无特殊要求'}
-        - 健康状况：${user.medicalConditions.join(', ') || '健康'}
+        - 饮食偏好：${user.dietaryPreferences?.join(', ') || '无特殊要求'}
+        - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         目标卡路里：${targetCalories} kcal
         
@@ -260,7 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 目标体重：${user.targetWeight}kg
         - 健身目标：${user.fitnessGoal}
         - 活动水平：${user.activityLevel}
-        - 健康状况：${user.medicalConditions.join(', ') || '健康'}
+        - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         请生成包含有氧运动和力量训练的完整计划，每项运动包含：
         1. 运动名称（中文）

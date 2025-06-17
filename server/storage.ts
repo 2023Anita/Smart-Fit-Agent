@@ -55,6 +55,25 @@ export class MemStorage implements IStorage {
     this.currentMealPlanId = 1;
     this.currentWorkoutPlanId = 1;
     this.currentProgressId = 1;
+    
+    // Create a default user for testing
+    this.initializeDefaultUser();
+  }
+
+  private async initializeDefaultUser() {
+    const defaultUser = {
+      name: "测试用户",
+      age: 25,
+      gender: "男性" as const,
+      height: 175,
+      currentWeight: 70,
+      targetWeight: 65,
+      activityLevel: "中度" as const,
+      fitnessGoal: "减重" as const,
+      dietaryPreferences: [] as string[],
+      medicalConditions: [] as string[]
+    };
+    await this.createUser(defaultUser);
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -68,7 +87,9 @@ export class MemStorage implements IStorage {
       ...insertUser, 
       id, 
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      dietaryPreferences: insertUser.dietaryPreferences || [],
+      medicalConditions: insertUser.medicalConditions || []
     };
     this.users.set(id, user);
     return user;
@@ -98,7 +119,8 @@ export class MemStorage implements IStorage {
     const mealPlan: MealPlan = {
       ...insertMealPlan,
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      aiGenerated: insertMealPlan.aiGenerated ?? true
     };
     this.mealPlans.set(id, mealPlan);
     return mealPlan;
@@ -127,7 +149,8 @@ export class MemStorage implements IStorage {
     const workoutPlan: WorkoutPlan = {
       ...insertWorkoutPlan,
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      aiGenerated: insertWorkoutPlan.aiGenerated ?? true
     };
     this.workoutPlans.set(id, workoutPlan);
     return workoutPlan;
@@ -156,7 +179,14 @@ export class MemStorage implements IStorage {
     const progress: DailyProgress = {
       ...insertProgress,
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      weight: insertProgress.weight ?? null,
+      waterIntake: insertProgress.waterIntake ?? 0,
+      steps: insertProgress.steps ?? 0,
+      caloriesConsumed: insertProgress.caloriesConsumed ?? 0,
+      caloriesBurned: insertProgress.caloriesBurned ?? 0,
+      exercisesCompleted: insertProgress.exercisesCompleted ?? [],
+      mealsCompleted: insertProgress.mealsCompleted ?? []
     };
     this.dailyProgress.set(id, progress);
     return progress;

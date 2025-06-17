@@ -39,7 +39,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const response = await fetch(`/api/users/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch user");
-      return response.json() as UserProfile;
+      return response.json();
     },
   });
 
@@ -257,7 +257,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h3 className="font-semibold">AI智能助手</h3>
-                    <p className="text-sm text-muted-foreground">Gemini 2.0 驱动</p>
+                    <p className="text-sm text-muted-foreground">健康agent 驱动</p>
                   </div>
                 </div>
                 <div className="space-y-3">
