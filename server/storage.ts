@@ -19,6 +19,7 @@ export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
 
@@ -56,6 +57,10 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {

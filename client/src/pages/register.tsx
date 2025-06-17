@@ -49,8 +49,10 @@ export default function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterData) => {
-      // Create user profile directly with unique email identifier
+      // Create user profile with email authentication
       const userProfile = {
+        email: data.email,
+        passwordHash: 'placeholder',
         name: data.name,
         age: data.age,
         gender: data.gender,
@@ -60,7 +62,11 @@ export default function Register() {
         activityLevel: data.activityLevel,
         fitnessGoal: data.fitnessGoal,
         dietaryPreferences: data.dietaryPreferences,
-        medicalConditions: data.medicalConditions
+        medicalConditions: data.medicalConditions,
+        isEmailVerified: true,
+        emailVerificationToken: null,
+        passwordResetToken: null,
+        passwordResetExpires: null
       };
       
       const response = await apiRequest('POST', '/api/users', userProfile);
@@ -80,7 +86,7 @@ export default function Register() {
     onError: (error: any) => {
       toast({
         title: "注册失败",
-        description: error.message || "注册过程中出现错误，请重试",
+        description: error.message || "该邮箱可能已被注册，请使用其他邮箱或直接登录",
         variant: "destructive",
       });
     }
