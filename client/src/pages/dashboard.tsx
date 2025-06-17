@@ -276,20 +276,72 @@ export default function Dashboard() {
     });
   };
 
-  // Toggle exercise completion
-  const toggleExerciseComplete = (exerciseId: string) => {
-    if (!workoutPlan) return;
-    
-    const updatedExercises = workoutPlan.exercises.map((exercise: any) =>
-      exercise.id === exerciseId ? { ...exercise, completed: !exercise.completed } : exercise
-    );
-    
-    // Update local state immediately for better UX
-    queryClient.setQueryData(["/api/workout-plans", userId, today], {
-      ...workoutPlan,
-      exercises: updatedExercises,
-    });
-  };
+  // Toggle exercise completion with calorie tracking
+  const toggleExerciseComplete = useMutation({
+    mutationFn: async (exerciseId: string) => {
+      if (!workoutPlan) return;
+      
+      const exercise = workoutPlan.exercises.find((ex: any) => ex.id === exerciseId);
+      if (!exercise) return;
+      
+      const wasCompleted = exercise.completed;
+      const updatedExercises = workoutPlan.exercises.map((ex: any) =>
+        ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
+      );
+      
+      // Calculate total calories burned from completed exercises
+      const totalCaloriesBurned = updatedExercises
+        .filter((ex: any) => ex.completed)
+        .reduce((sum: number, ex: any) => sum + (ex.calories || 0), 0);
+      
+      // Add step calories to total
+      const stepCalories = Math.round((dailyStats.steps || 0) * 0.04);
+      const finalCaloriesBurned = totalCaloriesBurned + stepCalories;
+      
+      // Update daily progress with new calorie burn
+      if (dailyProgress) {
+        const response = await apiRequest("PATCH", `/api/daily-progress/${dailyProgress.id}`, {
+          caloriesBurned: finalCaloriesBurned,
+        });
+        return { updatedExercises, response: response.json() };
+      } else {
+        const response = await apiRequest("POST", "/api/daily-progress", {
+          userId,
+          date: today,
+          caloriesBurned: finalCaloriesBurned,
+          waterIntake: 0,
+          steps: dailyStats.steps || 0,
+          weight: user?.currentWeight || 70,
+        });
+        return { updatedExercises, response: response.json() };
+      }
+    },
+    onSuccess: (data) => {
+      if (!data) return;
+      
+      // Update workout plan locally
+      queryClient.setQueryData(["/api/workout-plans", userId, today], {
+        ...workoutPlan,
+        exercises: data.updatedExercises,
+      });
+      
+      // Refresh all related queries to update statistics
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-progress", userId, today] });
+      queryClient.invalidateQueries({ queryKey: ["/api/weekly-progress", userId] });
+      
+      toast({
+        title: "运动记录已更新",
+        description: "卡路里消耗统计已同步更新",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "更新失败",
+        description: "请稍后重试",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Update water intake
   const updateWaterIntake = useMutation({
@@ -1134,7 +1186,7 @@ export default function Dashboard() {
                 <WorkoutCard
                   key={exercise.id}
                   exercise={exercise}
-                  onToggleComplete={toggleExerciseComplete}
+                  onToggleComplete={toggleExerciseComplete.mutate}
                 />
               ))}
             </div>
