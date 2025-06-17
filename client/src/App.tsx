@@ -49,7 +49,7 @@ function App() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center">
                 <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-success/10 border border-primary/20">
-                  <span className="text-sm font-medium bg-gradient-to-r from-primary to-success bg-clip-text text-transparent">
+                  <span className="text-sm font-semibold text-foreground">
                     所有权©睡眠魔法师
                   </span>
                   <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-primary to-success animate-pulse"></div>
