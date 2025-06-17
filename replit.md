@@ -109,6 +109,9 @@ Changelog:
 - June 17, 2025. Added PostgreSQL database integration with DatabaseStorage
 - June 17, 2025. Replaced "Gemini" branding with "健康agent" throughout UI
 - June 17, 2025. Successfully deployed with working AI meal/workout generation
+- June 17, 2025. Implemented meal photo recognition with Gemini 2.0 Flash Vision API
+- June 17, 2025. Created dedicated food tracking page with nutritional analysis
+- June 17, 2025. Replaced meal cards with elegant table layout and dropdown menus
 ```
 
 ## User Preferences

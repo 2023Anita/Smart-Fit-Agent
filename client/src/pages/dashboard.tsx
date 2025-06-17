@@ -18,7 +18,11 @@ import {
   Dumbbell,
   Camera,
   Check,
-  Clock
+  Clock,
+  MoreVertical,
+  Edit,
+  Trash2,
+  Eye
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -27,6 +31,7 @@ import { MealCard } from "@/components/meal-card";
 import { WorkoutCard } from "@/components/workout-card";
 import { ProgressChart } from "@/components/progress-chart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { UserProfile, DailyStats } from "@/types";
 
 export default function Dashboard() {
@@ -512,13 +517,51 @@ export default function Dashboard() {
                           <span className="font-medium text-success">{meal.fat}g</span>
                         </TableCell>
                         <TableCell className="text-right">
-                          {meal.imageUrl && (
-                            <img 
-                              src={meal.imageUrl} 
-                              alt={meal.name}
-                              className="w-12 h-12 rounded-lg object-cover inline-block"
-                            />
-                          )}
+                          <div className="flex items-center justify-end space-x-2">
+                            {meal.imageUrl && (
+                              <img 
+                                src={meal.imageUrl} 
+                                alt={meal.name}
+                                className="w-10 h-10 rounded-lg object-cover"
+                              />
+                            )}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => toggleMealComplete(meal.id)}>
+                                  {meal.completed ? (
+                                    <>
+                                      <Clock className="mr-2 h-4 w-4" />
+                                      标记为未完成
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Check className="mr-2 h-4 w-4" />
+                                      标记为完成
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  查看详情
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  编辑餐食
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  删除餐食
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
