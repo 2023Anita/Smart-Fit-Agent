@@ -10,7 +10,7 @@ This is a full-stack web application that provides personalized health and fitne
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite for fast development and optimized builds
 - **UI Framework**: shadcn/ui components built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom design tokens
+- **Styling**: Tailwind CSS with custom design tokens and health-themed colors
 - **State Management**: TanStack Query (React Query) for server state
 - **Routing**: Wouter for lightweight client-side routing
 - **Form Handling**: React Hook Form with Zod validation
@@ -18,8 +18,8 @@ This is a full-stack web application that provides personalized health and fitne
 ### Backend Architecture
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js for REST API
-- **Database**: PostgreSQL with Drizzle ORM
-- **AI Integration**: Google Gemini API for content generation
+- **Database**: PostgreSQL with Drizzle ORM (DatabaseStorage implementation)
+- **AI Integration**: Google Gemini API for health content generation
 - **Session Management**: Built-in Express session handling
 - **Build System**: ESBuild for production bundling
 
@@ -106,6 +106,9 @@ The application uses PostgreSQL with the following main entities:
 ```
 Changelog:
 - June 17, 2025. Initial setup
+- June 17, 2025. Added PostgreSQL database integration with DatabaseStorage
+- June 17, 2025. Replaced "Gemini" branding with "健康agent" throughout UI
+- June 17, 2025. Successfully deployed with working AI meal/workout generation
 ```
 
 ## User Preferences
