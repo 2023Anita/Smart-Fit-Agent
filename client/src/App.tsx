@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
 import Dashboard from "@/pages/dashboard";
 import ProfileSetup from "@/pages/profile-setup";
+import FoodTracking from "@/pages/food-tracking";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/profile" component={ProfileSetup} />
+      <Route path="/food-tracking" component={FoodTracking} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -147,7 +147,7 @@ async function generateMealImage(mealName: string, ingredients: string[], mealTy
   try {
     const prompt = `Studio Ghibli style illustration of ${mealName}, featuring ${ingredients.join(', ')}. Warm, cozy atmosphere with soft lighting, detailed food presentation, hand-drawn animation style reminiscent of Spirited Away and Howl's Moving Castle. Beautiful, appetizing, artistically arranged on a plate.`;
     
-    const response = await fetch('https://api.ssopen.top/api/generate-image', {
+    const response = await fetch('https://api.ssopen.top/v1/images/generations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -156,10 +156,10 @@ async function generateMealImage(mealName: string, ingredients: string[], mealTy
       body: JSON.stringify({
         model: 'flux.1.1-pro',
         prompt: prompt,
-        width: 512,
-        height: 384,
-        steps: 20,
-        guidance_scale: 7.5
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        response_format: "url"
       })
     });
 
@@ -172,10 +172,10 @@ async function generateMealImage(mealName: string, ingredients: string[], mealTy
 
     const data = await response.json();
     
-    if (data.success && data.data && data.data.image_url) {
-      return data.data.image_url;
-    } else if (data.image) {
-      return data.image;
+    if (data.data && data.data.length > 0 && data.data[0].url) {
+      return data.data[0].url;
+    } else if (data.url) {
+      return data.url;
     } else {
       // Fallback to SVG if API response format is unexpected
       const svgContent = generateMealSVG(mealName, mealType, ingredients);
@@ -186,6 +186,81 @@ async function generateMealImage(mealName: string, ingredients: string[], mealTy
     // Fallback to SVG
     const svgContent = generateMealSVG(mealName, mealType, ingredients);
     return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+  }
+}
+
+// Meal Photo Analysis using Gemini Vision
+async function analyzeMealPhoto(base64Image: string): Promise<any> {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("Gemini API key not found for photo analysis");
+  }
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              text: `请分析这张餐食照片，提供详细的营养分析。请以JSON格式返回结果，包含以下信息：
+              {
+                "mealName": "识别的菜品名称",
+                "ingredients": ["主要食材列表"],
+                "nutritionalInfo": {
+                  "calories": 估计卡路里,
+                  "protein": 蛋白质克数,
+                  "carbs": 碳水化合物克数,
+                  "fat": 脂肪克数,
+                  "fiber": 纤维克数,
+                  "sugar": 糖分克数
+                },
+                "portionSize": "分量大小描述",
+                "confidence": 0.0到1.0之间的置信度,
+                "healthScore": 1到10的健康评分,
+                "recommendations": ["营养建议"]
+              }
+              
+              请仔细观察照片中的食物种类、分量和制作方式，给出准确的营养估算。`
+            },
+            {
+              inlineData: {
+                mimeType: "image/jpeg",
+                data: base64Image
+              }
+            }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          topP: 0.8,
+          topK: 40,
+          maxOutputTokens: 2048,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const analysisText = data.candidates[0].content.parts[0].text;
+    
+    // Extract JSON from response
+    const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error("No JSON found in analysis response");
+    }
+  } catch (error) {
+    console.error('Meal photo analysis error:', error);
+    throw new Error('Failed to analyze meal photo');
   }
 }
 
@@ -566,6 +641,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(progress);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch weekly progress" });
+    }
+  });
+
+  // Meal photo analysis
+  app.post("/api/analyze-meal-photo", async (req, res) => {
+    try {
+      const { image } = req.body;
+      
+      if (!image) {
+        return res.status(400).json({ error: "图片数据缺失" });
+      }
+
+      // Remove data URL prefix if present
+      const base64Image = image.replace(/^data:image\/[a-z]+;base64,/, "");
+      
+      const analysis = await analyzeMealPhoto(base64Image);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Meal photo analysis error:', error);
+      res.status(500).json({ error: "Failed to analyze meal photo" });
     }
   });
 
