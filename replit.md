@@ -130,7 +130,7 @@ Changelog:
 - June 17, 2025. Implemented clickable food ingredients with serving suggestions showing weight/volume and units
 - June 17, 2025. Integrated food tracking meal statistics with dashboard AI meal plan for progress tracking
 - June 17, 2025. Fixed meal completion tracking to include both dashboard completed meals and photo-tracked meals
-- June 17, 2025. Added futuristic copyright footer with cyberpunk-style glowing purple text and tech effects
+- June 17, 2025. Added futuristic copyright footer with clear purple text on dark background for optimal readability
 ```
 
 ## User Preferences
