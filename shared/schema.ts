@@ -145,4 +145,6 @@ export type Exercise = {
   instructions: string[];
   difficulty: '简单' | '中等' | '困难';
   completed: boolean;
+  completedCount?: number; // 已完成次数
+  targetCount?: number; // 目标完成次数
 };

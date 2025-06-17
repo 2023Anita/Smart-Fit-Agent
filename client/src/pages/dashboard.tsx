@@ -1153,12 +1153,15 @@ export default function Dashboard() {
         {/* Workout Plan */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">今日运动计划</h2>
+            <h2 className="text-3xl font-bold font-mono text-white tracking-wider drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+              &gt;&gt; 今日运动计划
+            </h2>
             <Button
               onClick={() => generateWorkoutPlan.mutate()}
               disabled={generateWorkoutPlan.isPending}
               variant="outline"
               size="sm"
+              className="bg-gradient-to-r from-purple-600/80 to-pink-600/80 border-purple-400/50 text-white font-mono hover:from-purple-500/80 hover:to-pink-500/80 shadow-[0_0_8px_rgba(168,85,247,0.4)]"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${generateWorkoutPlan.isPending ? 'animate-spin' : ''}`} />
               重新生成
@@ -1167,16 +1170,16 @@ export default function Dashboard() {
 
           {workoutLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Skeleton className="h-64" />
-              <Skeleton className="h-64" />
+              <Skeleton className="h-64 bg-slate-800/50" />
+              <Skeleton className="h-64 bg-slate-800/50" />
             </div>
           ) : !workoutPlan ? (
-            <Card className="p-8 text-center">
+            <Card className="p-8 text-center bg-gradient-to-br from-slate-900/30 to-slate-800/30 border-slate-500/30">
               <div className="space-y-4">
-                <Dumbbell className="h-12 w-12 text-muted-foreground mx-auto" />
+                <Dumbbell className="h-12 w-12 text-slate-400 mx-auto animate-pulse" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">暂无运动计划</h3>
-                  <p className="text-muted-foreground">点击上方按钮生成AI个性化运动方案</p>
+                  <h3 className="font-semibold text-white mb-2 font-mono">暂无运动计划</h3>
+                  <p className="text-slate-400 font-mono">点击上方按钮生成AI个性化运动方案</p>
                 </div>
               </div>
             </Card>
@@ -1185,8 +1188,19 @@ export default function Dashboard() {
               {workoutPlan.exercises.map((exercise: any) => (
                 <WorkoutCard
                   key={exercise.id}
-                  exercise={exercise}
+                  exercise={{
+                    ...exercise,
+                    completedCount: exercise.completedCount || 0,
+                    targetCount: exercise.targetCount || (exercise.sets || 1)
+                  }}
                   onToggleComplete={toggleExerciseComplete.mutate}
+                  onUpdateCount={(exerciseId, count) => {
+                    // Update exercise count in local state
+                    const updatedExercises = workoutPlan.exercises.map((ex: any) =>
+                      ex.id === exerciseId ? { ...ex, completedCount: count } : ex
+                    );
+                    // This will be handled by the mutation for calorie calculation
+                  }}
                 />
               ))}
             </div>
