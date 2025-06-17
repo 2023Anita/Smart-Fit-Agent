@@ -497,7 +497,6 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h3 className="font-semibold">AI智能助手</h3>
-                    <p className="text-sm text-muted-foreground">健康agent 驱动</p>
                   </div>
                 </div>
                 <div className="space-y-3">
