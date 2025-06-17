@@ -369,6 +369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - 健康状况：${user.medicalConditions?.join(', ') || '健康'}
         
         目标卡路里：${targetCalories} kcal
+        随机种子：${baseRandomSeed}
         **严格随机化指令 - 必须基于以下参数创造完全不同的组合：**
         
         烹饪风格选择器 ${cuisineSelector}：
@@ -499,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ]
         ];
         
-        const dayIndex = randomSeed % 3;
+        const dayIndex = baseRandomSeed % 3;
         const selectedMeals = [
           { ...mealVariations[0][dayIndex], type: "早餐", calories: breakfastCal },
           { ...mealVariations[1][dayIndex], type: "午餐", calories: lunchCal },
