@@ -52,6 +52,59 @@ async function generateWithGemini(prompt: string): Promise<any> {
   }
 }
 
+// Gemini Image Generation
+async function generateMealImage(mealName: string, ingredients: string[]): Promise<string | undefined> {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  
+  if (!apiKey) {
+    console.warn("Gemini API key not found for image generation");
+    return undefined;
+  }
+
+  try {
+    const prompt = `Generate a beautiful, warm and inviting Studio Ghibli style illustration of ${mealName}. The image should show ${ingredients.join(', ')} arranged in an artistic way. Use soft, warm colors and the characteristic Studio Ghibli aesthetic with detailed food presentation, cozy atmosphere, and gentle lighting. The style should be reminiscent of food scenes from Spirited Away or Howl's Moving Castle.`;
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      console.warn(`Gemini image generation error: ${response.status}`);
+      return undefined;
+    }
+
+    const data = await response.json();
+    
+    // Extract image URL from Gemini response
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+      for (const part of data.candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.mimeType && part.inlineData.data) {
+          // Return base64 data URL
+          return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        }
+      }
+    }
+    
+    return undefined;
+  } catch (error) {
+    console.warn('Gemini image generation error:', error);
+    return undefined;
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
   app.post("/api/users", async (req, res) => {
@@ -209,11 +262,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
       }
 
-      // Add IDs and completion status to meals
-      const mealsWithIds = mealData.meals.map((meal: any, index: number) => ({
-        ...meal,
-        id: `meal-${Date.now()}-${index}`,
-        completed: false
+      // Add IDs, completion status and generate images for meals
+      const mealsWithIds = await Promise.all(mealData.meals.map(async (meal: any, index: number) => {
+        const imageUrl = await generateMealImage(meal.name, meal.ingredients);
+        return {
+          ...meal,
+          id: `meal-${Date.now()}-${index}`,
+          completed: false,
+          imageUrl: imageUrl
+        };
       }));
 
       const mealPlan = await storage.createMealPlan({

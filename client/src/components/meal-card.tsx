@@ -20,7 +20,15 @@ export function MealCard({ meal, onToggleComplete }: MealCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow">
       <div className="h-32 bg-gray-100 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10" />
+        {meal.imageUrl ? (
+          <img 
+            src={meal.imageUrl} 
+            alt={meal.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10" />
+        )}
         <div className="absolute top-2 right-2">
           <Badge className={mealTypeColors[meal.type]}>
             {meal.type}
