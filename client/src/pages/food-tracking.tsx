@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Calendar, TrendingUp, Target, Plus, Camera, Utensils, Sparkles, ChefHat, Trash2, MoreVertical } from "lucide-react";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
 
 interface NutritionalInfo {
   calories: number;
@@ -37,6 +38,20 @@ interface TrackedMeal extends MealAnalysis {
 export default function FoodTracking() {
   const [trackedMeals, setTrackedMeals] = useState<TrackedMeal[]>([]);
   const [showAnalyzer, setShowAnalyzer] = useState(false);
+  const [userId] = useState(() => {
+    return parseInt(localStorage.getItem("userId") || "1");
+  });
+  const today = new Date().toISOString().split('T')[0];
+
+  // Fetch AI-generated meal plan from dashboard
+  const { data: mealPlan } = useQuery({
+    queryKey: ["/api/meal-plans", userId, today],
+    queryFn: async () => {
+      const response = await fetch(`/api/meal-plans/${userId}/${today}`);
+      if (!response.ok) return null;
+      return response.json();
+    },
+  });
 
   // Load tracked meals from localStorage on component mount
   useEffect(() => {
@@ -255,18 +270,53 @@ export default function FoodTracking() {
             <CardContent>
               <div className="space-y-3">
                 {['早餐', '午餐', '晚餐', '加餐'].map((mealType) => {
-                  const count = trackedMeals.filter(meal => meal.mealType === mealType).length;
+                  const trackedCount = trackedMeals.filter(meal => meal.mealType === mealType).length;
+                  const plannedCount = mealPlan?.meals?.filter((meal: any) => meal.type === mealType).length || 0;
+                  const totalPlanned = plannedCount;
+                  const completionRate = totalPlanned > 0 ? Math.round((trackedCount / totalPlanned) * 100) : 0;
+                  
                   return (
-                    <div key={mealType} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full ${getMealTypeColor(mealType)}`} />
-                        <span className="text-sm">{mealType}</span>
+                    <div key={mealType} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full ${getMealTypeColor(mealType)}`} />
+                          <span className="text-sm font-medium">{mealType}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="text-xs">
+                            已记录 {trackedCount}
+                          </Badge>
+                          {totalPlanned > 0 && (
+                            <Badge variant="secondary" className="text-xs">
+                              计划 {totalPlanned}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      <Badge variant="outline">{count}</Badge>
+                      {totalPlanned > 0 && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>完成进度</span>
+                            <span>{completionRate}%</span>
+                          </div>
+                          <Progress 
+                            value={completionRate} 
+                            className="h-1.5"
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
+              
+              {mealPlan?.meals && (
+                <div className="mt-4 pt-4 border-t">
+                  <div className="text-xs text-muted-foreground text-center">
+                    💡 基于AI饮食计划与实际记录的统计对比
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
