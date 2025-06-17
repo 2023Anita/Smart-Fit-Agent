@@ -294,12 +294,13 @@ export default function Dashboard() {
   }
 
   // Calculate daily stats
+  const currentWeight = dailyProgress?.weight || user.currentWeight;
   const dailyStats: DailyStats = {
     caloriesConsumed: mealPlan?.meals.filter((m: any) => m.completed).reduce((sum: number, m: any) => sum + m.calories, 0) || 0,
     caloriesBurned: workoutPlan?.exercises.filter((e: any) => e.completed).reduce((sum: number, e: any) => sum + e.calories, 0) || 0,
     waterIntake: dailyProgress?.waterIntake || 0,
     steps: dailyProgress?.steps || 0,
-    weight: dailyProgress?.weight || user.currentWeight,
+    weight: currentWeight,
   };
 
   // Process weekly progress data for charts
@@ -853,7 +854,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-success/10 rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">当前体重</p>
-                    <p className="text-2xl font-bold text-foreground">{dailyStats.weight}kg</p>
+                    <p className="text-2xl font-bold text-foreground">{(dailyStats.weight || user.currentWeight)}kg</p>
                     <p className="text-xs text-muted-foreground">
                       目标: {user.targetWeight}kg
                     </p>
@@ -861,11 +862,11 @@ export default function Dashboard() {
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">距离目标</p>
                     <p className={`text-lg font-semibold ${
-                      Math.abs(dailyStats.weight - user.targetWeight) <= 1 
+                      Math.abs((dailyStats.weight || user.currentWeight) - user.targetWeight) <= 1 
                         ? 'text-success' 
                         : 'text-secondary'
                     }`}>
-                      {Math.abs(dailyStats.weight - user.targetWeight).toFixed(1)}kg
+                      {Math.abs((dailyStats.weight || user.currentWeight) - user.targetWeight).toFixed(1)}kg
                     </p>
                   </div>
                 </div>
@@ -876,7 +877,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => updateWeight.mutate(dailyStats.weight - 0.1)}
+                      onClick={() => updateWeight.mutate((dailyStats.weight || user.currentWeight) - 0.1)}
                       disabled={updateWeight.isPending}
                       className="text-xs"
                     >
@@ -886,7 +887,7 @@ export default function Dashboard() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const weight = prompt("请输入今日体重(kg):", dailyStats.weight.toString());
+                        const weight = prompt("请输入今日体重(kg):", (dailyStats.weight || user.currentWeight).toString());
                         if (weight && !isNaN(Number(weight))) {
                           updateWeight.mutate(Number(weight));
                         }
@@ -899,7 +900,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => updateWeight.mutate(dailyStats.weight + 0.1)}
+                      onClick={() => updateWeight.mutate((dailyStats.weight || user.currentWeight) + 0.1)}
                       disabled={updateWeight.isPending}
                       className="text-xs"
                     >
