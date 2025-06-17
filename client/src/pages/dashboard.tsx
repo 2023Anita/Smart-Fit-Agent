@@ -455,8 +455,17 @@ export default function Dashboard() {
   const mealPlanCalories = mealPlan?.meals.filter((m: any) => m.completed).reduce((sum: number, m: any) => sum + m.calories, 0) || 0;
   const totalCaloriesConsumed = mealPlanCalories + trackedMealsCalories;
   
-  // Calculate calories burned from workouts and steps
-  const workoutCalories = workoutPlan?.exercises.filter((e: any) => e.completed).reduce((sum: number, e: any) => sum + e.calories, 0) || 0;
+  // Calculate calories burned from workouts based on completion ratio and steps
+  const workoutCalories = workoutPlan?.exercises.reduce((sum: number, e: any) => {
+    // If exercise is marked as completed, use full calories
+    if (e.completed) {
+      return sum + (e.calories || 0);
+    }
+    // Otherwise, calculate based on completion ratio
+    const completionRatio = Math.min((e.completedCount || 0) / (e.targetCount || 1), 1);
+    return sum + Math.round((e.calories || 0) * completionRatio);
+  }, 0) || 0;
+  
   const stepCalories = Math.round((dailyProgress?.steps || 0) * 0.04); // ~0.04 calories per step
   const totalCaloriesBurned = workoutCalories + stepCalories;
   
