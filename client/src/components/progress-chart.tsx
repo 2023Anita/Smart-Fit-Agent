@@ -23,7 +23,7 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
     <Card className="bg-gradient-to-br from-slate-900/20 via-background to-slate-900/20 border-cyan-500/20 shadow-lg shadow-cyan-500/10">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-mono tracking-wide text-cyan-300 drop-shadow-[0_0_4px_rgba(34,211,238,0.5)]">
+          <CardTitle className="text-lg font-mono tracking-wide text-cyan-100 drop-shadow-[0_0_6px_rgba(34,211,238,0.8)] font-bold">
             {title}
           </CardTitle>
           {trend && (
@@ -31,8 +31,8 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
               variant={trend.positive ? "default" : "secondary"}
               className={`font-mono font-bold ${
                 trend.positive 
-                  ? "bg-gradient-to-r from-green-500/20 to-cyan-500/20 text-cyan-300 border-cyan-400/40 shadow-[0_0_8px_rgba(34,211,238,0.3)]" 
-                  : "bg-gradient-to-r from-red-500/20 to-orange-500/20 text-orange-300 border-orange-400/40 shadow-[0_0_8px_rgba(251,146,60,0.3)]"
+                  ? "bg-gradient-to-r from-green-500/20 to-cyan-500/20 text-cyan-100 border-cyan-400/40 shadow-[0_0_8px_rgba(34,211,238,0.3)]" 
+                  : "bg-gradient-to-r from-red-500/20 to-orange-500/20 text-orange-100 border-orange-400/40 shadow-[0_0_8px_rgba(251,146,60,0.3)]"
               }`}
             >
               {trend.positive ? "↗" : "↘"} {trend.value}{unit}
@@ -91,8 +91,8 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
                 </div>
                 
                 {/* 数值显示 */}
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <span className="text-xs font-mono font-bold text-cyan-300 bg-black/80 px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <span className="text-sm font-mono font-bold text-cyan-100 bg-black/90 px-3 py-1.5 rounded-md shadow-xl border border-cyan-500/30 whitespace-nowrap">
                     {value}{unit}
                   </span>
                 </div>
@@ -101,9 +101,9 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
           })}
         </div>
         
-        <div className="flex justify-between text-xs font-mono">
+        <div className="flex justify-between text-sm font-mono">
           {labels.map((label, index) => (
-            <span key={index} className="text-center text-cyan-400/70 hover:text-cyan-300 transition-colors">
+            <span key={index} className="text-center text-white font-bold hover:text-cyan-100 transition-colors drop-shadow-[0_0_4px_rgba(255,255,255,0.7)]">
               {label}
             </span>
           ))}
@@ -111,7 +111,7 @@ export function ProgressChart({ title, data, labels, color, unit, trend }: Progr
         
         {trend && (
           <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-slate-900/30 via-cyan-900/10 to-slate-900/30 border border-cyan-500/20 backdrop-blur-sm">
-            <p className="text-xs font-mono text-cyan-300/80">{trend.label}</p>
+            <p className="text-sm font-mono text-cyan-100/90 font-medium">{trend.label}</p>
           </div>
         )}
       </CardContent>

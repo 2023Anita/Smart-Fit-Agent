@@ -132,6 +132,8 @@ Changelog:
 - June 17, 2025. Fixed meal completion tracking to include both dashboard completed meals and photo-tracked meals
 - June 17, 2025. Added futuristic copyright footer with clear purple text on dark background for optimal readability
 - June 17, 2025. Enhanced progress charts with cyberpunk-style visual effects, animated bars, and interactive hover states
+- June 17, 2025. Improved progress chart readability with larger, brighter text and enhanced contrast
+- June 17, 2025. Enhanced date labels with white text and glow effects for maximum visibility
 ```
 
 ## User Preferences
