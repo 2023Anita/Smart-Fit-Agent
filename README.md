@@ -10,6 +10,10 @@
 ## ✨ 项目简介
 Smart-Fit-Agent 是一款融合多模态人工智能与前沿医疗知识的健康管理应用。应用集成了现代Web技术与Google Gemini AI的强大算力，能够智能解析用户的生理、行为和环境数据，生成高度个性化的健康管理方案。
 本项目由一名麻醉医生开发，致力于跨界运用AI技术科学应对体重管理难题。想获取更多专业健康与睡眠科普，请关注公众号 “睡眠魔法师”，开启你的健康进阶之旅！
+<img width="552" alt="image" src="https://github.com/user-attachments/assets/6cc37f1d-e1b5-4151-a2e5-962edbb2dff1" />
+<img width="1311" alt="image" src="https://github.com/user-attachments/assets/001304c5-e1ae-450c-931b-0dd5aaaeb989" />
+<img width="1199" alt="image" src="https://github.com/user-attachments/assets/aab5370c-7d1f-4d89-9cae-1f5982a56339" />
+<img width="1064" alt="image" src="https://github.com/user-attachments/assets/55982e5d-bf40-428b-b226-cfca40c7c9d6" />
 ### 🎯 核心特性
 
 - 🧠 **AI个性化计划生成** - 基于用户画像生成独特的餐食和运动计划
